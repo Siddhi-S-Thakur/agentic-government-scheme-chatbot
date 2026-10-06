@@ -106,3 +106,27 @@ def retrieve_schemes(request: RetrievalRequest):
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+from app.schemas.profile_schema import UserProfile
+from app.eligibility.engine import EligibilityEngine
+from app.eligibility.models import EligibilityEvaluation
+from pydantic import BaseModel
+
+class EligibilityRequest(BaseModel):
+    profile: UserProfile
+    scheme_id: Optional[str] = None
+
+@app.post("/api/eligibility", response_model=list[EligibilityEvaluation])
+def check_eligibility(request: EligibilityRequest):
+    """
+    Deterministic eligibility check evaluating user profile against scheme rules.
+    """
+    if request.scheme_id:
+        scheme = loaded_schemes.get(request.scheme_id)
+        if not scheme:
+            raise HTTPException(status_code=404, detail=f"Scheme '{request.scheme_id}' not found.")
+        return [EligibilityEngine.evaluate(request.profile, scheme)]
+    
+    # Evaluate across all loaded schemes
+    return EligibilityEngine.batch_evaluate(request.profile, list(loaded_schemes.values()))
+

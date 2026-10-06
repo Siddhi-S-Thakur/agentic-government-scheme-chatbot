@@ -39,3 +39,40 @@ def test_retrieve_api_endpoint(client):
     assert top["official_url"] == "https://pmkisan.gov.in"
     assert data["debug_info"] is not None
     assert "pm-kisan" in [r["scheme_id"] for r in data["debug_info"]["final_top_k"]]
+
+def test_eligibility_api_endpoint_single(client):
+    payload = {
+        "scheme_id": "pm-kisan",
+        "profile": {
+            "age": 28,
+            "occupation": "farmer",
+            "state": "Maharashtra"
+        }
+    }
+    response = client.post("/api/eligibility", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    eval_res = data[0]
+    assert eval_res["scheme_id"] == "pm-kisan"
+    assert eval_res["status"] == "ELIGIBLE"
+    assert eval_res["official_url"] == "https://pmkisan.gov.in"
+
+def test_eligibility_api_endpoint_missing_info(client):
+    payload = {
+        "scheme_id": "sanjay-gandhi-niradhar",
+        "profile": {
+            "state": "Maharashtra"
+            # Missing income and age
+        }
+    }
+    response = client.post("/api/eligibility", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    eval_res = data[0]
+    assert eval_res["scheme_id"] == "sanjay-gandhi-niradhar"
+    assert eval_res["status"] == "INFORMATION_MISSING"
+    assert "annual_income" in eval_res["missing_fields"]
+    assert "age" in eval_res["missing_fields"]
+
