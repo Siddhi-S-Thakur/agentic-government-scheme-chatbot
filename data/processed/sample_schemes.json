@@ -1,0 +1,188 @@
+[
+  {
+    "scheme_id": "pm-kisan",
+    "scheme_name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+    "scheme_name_hi": "प्रधानमंत्री किसान सम्मान निधि (पीएम-किसान)",
+    "scheme_name_mr": "प्रधानमंत्री किसान सन्मान निधी (पीएम-किसान)",
+    "description": "A central sector scheme to provide income support to all landholding farmer families in the country to supplement their financial needs for procuring various inputs related to agriculture and domestic requirements.",
+    "department": "Department of Agriculture and Farmers Welfare",
+    "level": "central",
+    "state": null,
+    "beneficiary_categories": ["farmer", "small_farmer", "marginal_farmer"],
+    "scheme_category": "Agriculture",
+    "benefits": "Financial benefit of ₹6,000 per year in three equal installments of ₹2,000 every four months transferred directly into bank accounts.",
+    "eligibility_criteria": {
+      "min_age": 18,
+      "max_age": null,
+      "max_income": null,
+      "min_income": null,
+      "occupations": ["farmer"],
+      "education_qualifications": [],
+      "caste_categories": [],
+      "gender": "all",
+      "marital_status": null,
+      "residence_state": null,
+      "landholding_max_acres": null,
+      "requires_disability": null,
+      "additional_conditions": [
+        "Farmer family owning cultivable land in their names",
+        "Excludes institutional landholders, serving/retired government officials, and income tax payees"
+      ]
+    },
+    "documents_required": [
+      "Aadhaar Card",
+      "Land ownership record (7/12 extract or Jamabandi)",
+      "Bank Account Details (Aadhaar linked)"
+    ],
+    "application_procedure": "Apply online at pmkisan.gov.in portal or visit the nearest Common Service Centre (CSC) with land record and Aadhaar.",
+    "official_url": "https://pmkisan.gov.in",
+    "source_department": "Ministry of Agriculture and Farmers Welfare, Government of India",
+    "last_updated": "2026-01-15",
+    "tags": ["farmer", "agriculture", "financial assistance", "kisan", "pm-kisan", "direct benefit transfer"],
+    "metadata": {
+      "is_test_data": true,
+      "target_group": "Farmers"
+    }
+  },
+  {
+    "scheme_id": "sanjay-gandhi-niradhar",
+    "scheme_name": "Sanjay Gandhi Niradhar Anudan Yojana",
+    "scheme_name_hi": "संजय गांधी निराधार अनुदान योजना",
+    "scheme_name_mr": "संजय गांधी निराधार अनुदान योजना",
+    "description": "A Maharashtra state welfare scheme providing monthly financial assistance to destitute persons, blind, disabled, orphans, and persons suffering from severe illness who have no source of livelihood.",
+    "department": "Social Justice and Special Assistance Department",
+    "level": "state",
+    "state": "Maharashtra",
+    "beneficiary_categories": ["destitute", "senior_citizen", "differently_abled", "women"],
+    "scheme_category": "Social Welfare",
+    "benefits": "Monthly pension of ₹1,500 for eligible single beneficiaries and ₹2,400 for families with two or more beneficiaries.",
+    "eligibility_criteria": {
+      "min_age": 65,
+      "max_age": null,
+      "max_income": 21000.0,
+      "min_income": null,
+      "occupations": ["unemployed", "destitute"],
+      "education_qualifications": [],
+      "caste_categories": [],
+      "gender": "all",
+      "marital_status": null,
+      "residence_state": "Maharashtra",
+      "landholding_max_acres": null,
+      "requires_disability": null,
+      "additional_conditions": [
+        "Permanent resident of Maharashtra for at least 15 years",
+        "Annual family income must not exceed ₹21,000"
+      ]
+    },
+    "documents_required": [
+      "Age proof certificate",
+      "Maharashtra Domicile / 15 years residence certificate",
+      "Income certificate issued by Tahsildar (annual income under ₹21,000)",
+      "Disability certificate (if applying under disability category)",
+      "Aadhaar Card and Bank Passbook"
+    ],
+    "application_procedure": "Submit application form at the Tahsildar office or Aaple Sarkar portal in Maharashtra.",
+    "official_url": "https://sjsa.maharashtra.gov.in",
+    "source_department": "Government of Maharashtra",
+    "last_updated": "2026-02-10",
+    "tags": ["maharashtra", "niradhar", "pension", "destitute", "disability", "senior citizen", "social welfare"],
+    "metadata": {
+      "is_test_data": true,
+      "target_group": "Destitute and Senior Citizens of Maharashtra"
+    }
+  },
+  {
+    "scheme_id": "mahadbt-post-matric",
+    "scheme_name": "Government of India Post-Matric Scholarship for SC Students - Maharashtra",
+    "scheme_name_hi": "महाराष्ट्र अनुसूचित जाति के लिए भारत सरकार मैट्रिकोत्तर छात्रवृत्ति",
+    "scheme_name_mr": "महाराष्ट्र अनुसूचित जातीसाठी भारत सरकार मॅट्रिकोत्तर शिष्यवृत्ती",
+    "description": "Financial scholarship to enable Scheduled Caste students of Maharashtra to pursue post-matriculation or post-secondary education.",
+    "department": "Social Justice and Special Assistance Department",
+    "level": "state",
+    "state": "Maharashtra",
+    "beneficiary_categories": ["student", "sc"],
+    "scheme_category": "Education",
+    "benefits": "Full reimbursement of tuition fees, examination fees, and monthly maintenance allowance.",
+    "eligibility_criteria": {
+      "min_age": null,
+      "max_age": null,
+      "max_income": 250000.0,
+      "min_income": null,
+      "occupations": ["student"],
+      "education_qualifications": ["10th_pass", "12th_pass", "undergraduate", "postgraduate"],
+      "caste_categories": ["SC"],
+      "gender": "all",
+      "marital_status": null,
+      "residence_state": "Maharashtra",
+      "landholding_max_acres": null,
+      "requires_disability": null,
+      "additional_conditions": [
+        "Candidate must belong to Scheduled Caste (SC) category",
+        "Family annual income must not exceed ₹2.5 lakh",
+        "Enrolled in a recognized post-matric course"
+      ]
+    },
+    "documents_required": [
+      "Caste Certificate issued by competent authority",
+      "Income Certificate from Tahsildar (under ₹2.5 Lakh)",
+      "10th / SSC Marksheet",
+      "College Admission Fee Receipt and Allotment Letter",
+      "Aadhaar Card linked to Bank Account",
+      "Maharashtra Domicile Certificate"
+    ],
+    "application_procedure": "Apply online through the MahaDBT portal (mahadbt.maharashtra.gov.in).",
+    "official_url": "https://mahadbt.maharashtra.gov.in",
+    "source_department": "Social Justice Department, Government of Maharashtra",
+    "last_updated": "2026-01-20",
+    "tags": ["scholarship", "mahadbt", "student", "sc", "education", "maharashtra", "post-matric"],
+    "metadata": {
+      "is_test_data": true,
+      "target_group": "SC Students in Maharashtra"
+    }
+  },
+  {
+    "scheme_id": "ayushman-bharat",
+    "scheme_name": "Ayushman Bharat - Pradhan Mantri Jan Arogya Yojana (PM-JAY)",
+    "scheme_name_hi": "आयुष्मान भारत - प्रधानमंत्री जन आरोग्य योजना (पीएम-जय)",
+    "scheme_name_mr": "आयुष्मान भारत - प्रधानमंत्री जन आरोग्य योजना (पीएम-जय)",
+    "description": "World's largest government-funded healthcare assurance scheme providing cashless secondary and tertiary hospitalization care to vulnerable and economically weaker families.",
+    "department": "National Health Authority, Ministry of Health and Family Welfare",
+    "level": "central",
+    "state": null,
+    "beneficiary_categories": ["economically_weaker", "rural_poor", "urban_worker"],
+    "scheme_category": "Healthcare",
+    "benefits": "Cashless health cover up to ₹5,00,000 per family per year for secondary and tertiary care hospitalization across empanelled hospitals.",
+    "eligibility_criteria": {
+      "min_age": null,
+      "max_age": null,
+      "max_income": null,
+      "min_income": null,
+      "occupations": [],
+      "education_qualifications": [],
+      "caste_categories": [],
+      "gender": "all",
+      "marital_status": null,
+      "residence_state": null,
+      "landholding_max_acres": null,
+      "requires_disability": null,
+      "additional_conditions": [
+        "Families identified under deprivation and occupational criteria of Socio-Economic Caste Census (SECC 2011)",
+        "Also extended to all citizens aged 70 years and above irrespective of income"
+      ]
+    },
+    "documents_required": [
+      "Aadhaar Card",
+      "Ration Card or Family ID",
+      "PM-JAY Beneficiary ID or Ayushman Card"
+    ],
+    "application_procedure": "Check eligibility at beneficiary.nha.gov.in or visit any empanelled public or private hospital with Aadhaar and Ration Card to generate Ayushman Card.",
+    "official_url": "https://pmjay.gov.in",
+    "source_department": "National Health Authority, Government of India",
+    "last_updated": "2026-02-01",
+    "tags": ["health", "hospitalization", "ayushman bharat", "pm-jay", "medical cover", "cashless treatment"],
+    "metadata": {
+      "is_test_data": true,
+      "target_group": "Economically vulnerable families and senior citizens 70+"
+    }
+  }
+]

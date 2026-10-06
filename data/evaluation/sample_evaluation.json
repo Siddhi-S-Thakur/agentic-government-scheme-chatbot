@@ -1,0 +1,55 @@
+[
+  {
+    "query": "PM-KISAN scheme benefits and required documents",
+    "expected_scheme_ids": ["pm-kisan"],
+    "language": "en",
+    "profile": {
+      "occupation": "farmer"
+    },
+    "metadata_filters": null
+  },
+  {
+    "query": "किसान सन्मान निधीसाठी कोणती कागदपत्रे लागतात?",
+    "expected_scheme_ids": ["pm-kisan"],
+    "language": "mr",
+    "profile": null,
+    "metadata_filters": null
+  },
+  {
+    "query": "संजय गांधी निराधार अनुदान योजना उत्पन्न मर्यादा आणि अर्ज",
+    "expected_scheme_ids": ["sanjay-gandhi-niradhar"],
+    "language": "mr",
+    "profile": {
+      "state": "Maharashtra"
+    },
+    "metadata_filters": {
+      "state": "Maharashtra"
+    }
+  },
+  {
+    "query": "Post matric scholarship for Scheduled Caste students in Maharashtra",
+    "expected_scheme_ids": ["mahadbt-post-matric"],
+    "language": "en",
+    "profile": {
+      "state": "Maharashtra",
+      "occupation": "student"
+    },
+    "metadata_filters": {
+      "state": "Maharashtra"
+    }
+  },
+  {
+    "query": "Cashless hospitalization cover up to 5 lakh rupees for poor families",
+    "expected_scheme_ids": ["ayushman-bharat"],
+    "language": "en",
+    "profile": null,
+    "metadata_filters": null
+  },
+  {
+    "query": "आयुष्मान भारत योजना 5 लाख अस्पताल उपचार",
+    "expected_scheme_ids": ["ayushman-bharat"],
+    "language": "hi",
+    "profile": null,
+    "metadata_filters": null
+  }
+]
