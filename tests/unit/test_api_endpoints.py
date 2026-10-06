@@ -76,3 +76,28 @@ def test_eligibility_api_endpoint_missing_info(client):
     assert "annual_income" in eval_res["missing_fields"]
     assert "age" in eval_res["missing_fields"]
 
+def test_chat_api_endpoint_clarification(client):
+    payload = {
+        "message": "Find schemes for me"
+    }
+    response = client.post("/api/chat", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["needs_clarification"] is True
+    assert len(data["response"]) > 0
+    assert "session_state" in data
+
+def test_chat_api_endpoint_full_flow(client):
+    payload = {
+        "message": "I am a 25 years old farmer from Maharashtra with income 2 lakh. Tell me what schemes I can apply for."
+    }
+    response = client.post("/api/chat", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["needs_clarification"] is False
+    assert len(data["recommendations"]) > 0
+    assert "PM-KISAN" in data["response"]
+    assert len(data["source_urls"]) > 0
+    assert "https://pmkisan.gov.in" in data["source_urls"]
+
+

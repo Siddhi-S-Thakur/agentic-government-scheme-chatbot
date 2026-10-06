@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
+from pydantic import BaseModel, Field
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -129,4 +130,64 @@ def check_eligibility(request: EligibilityRequest):
     
     # Evaluate across all loaded schemes
     return EligibilityEngine.batch_evaluate(request.profile, list(loaded_schemes.values()))
+
+from app.agent.service import AgentOrchestratorService
+
+agent_service = AgentOrchestratorService(retriever, loaded_schemes)
+
+class ChatRequest(BaseModel):
+    message: str
+    session_state: Optional[dict[str, Any]] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    detected_language: str
+    interaction_mode: str
+    needs_clarification: bool
+    mcq_options: Optional[list[dict[str, Any]]] = None
+    profile: dict[str, Any]
+    recommendations: list[dict[str, Any]]
+    source_urls: list[str]
+    session_state: dict[str, Any]
+
+ChatRequest.model_rebuild()
+ChatResponse.model_rebuild()
+
+@app.post("/api/chat", response_model=ChatResponse)
+def chat_turn(request: ChatRequest):
+    """
+    Execute a conversational turn through the LangGraph AI orchestrator agent.
+    """
+    try:
+        updated_state = agent_service.process_turn(
+            user_input=request.message,
+            session_state=request.session_state
+        )
+
+        # Serialize recommendations and profile
+        profile_dict = updated_state["profile"].model_dump()
+        recs_list = [r.model_dump() for r in updated_state.get("eligibility_recommendations", [])]
+
+        # Prepare state for next turn
+        serializable_state = {
+            "messages": updated_state.get("messages", []),
+            "profile": profile_dict,
+            "detected_language": updated_state.get("detected_language", "en"),
+            "interaction_mode": updated_state.get("interaction_mode", "text")
+        }
+
+        return ChatResponse(
+            response=updated_state.get("final_response", ""),
+            detected_language=updated_state.get("detected_language", "en"),
+            interaction_mode=updated_state.get("interaction_mode", "text"),
+            needs_clarification=updated_state.get("needs_clarification", False),
+            mcq_options=updated_state.get("mcq_options"),
+            profile=profile_dict,
+            recommendations=recs_list,
+            source_urls=updated_state.get("source_urls", []),
+            session_state=serializable_state
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
