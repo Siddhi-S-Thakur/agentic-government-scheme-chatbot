@@ -156,62 +156,24 @@ class AgentNodeHandlers:
     def generate_explanation_node(cls, state: AgentState) -> dict[str, Any]:
         """
         Synthesizes an explainable, source-grounded response in the user's active language
-        based on retrieved evidence and deterministic eligibility evaluations.
+        based on retrieved evidence and deterministic eligibility evaluations using the configured LLM service.
         """
+        from app.llm.factory import get_llm_service
+
+        user_query = state.get("user_query", "")
         lang = state.get("detected_language", "en")
+        profile = state.get("profile")
         recommendations = state.get("eligibility_recommendations", [])
-        urls = state.get("source_urls", [])
+        evidence = state.get("retrieved_evidence", [])
 
-        if not recommendations:
-            if lang == "hi":
-                resp = "मुझे आपके मानदंडों से मेल खाने वाली कोई सरकारी योजना नहीं मिली। कृपया अधिक विवरण प्रदान करें।"
-            elif lang == "mr":
-                resp = "मला तुमच्या निकषांशी जुळणारी कोणतीही सरकारी योजना सापडली नाही. कृपया अधिक माहिती द्या."
-            else:
-                resp = "I could not find any government schemes matching your criteria. Please provide more details."
-            return {"final_response": resp}
-
-        # Build explainable response
-        response_lines = []
-        if lang == "hi":
-            response_lines.append(f"### आपके लिए अनुशंसित सरकारी योजनाएं ({len(recommendations)}):\n")
-        elif lang == "mr":
-            response_lines.append(f"### तुमच्यासाठी शिफारस केलेल्या सरकारी योजना ({len(recommendations)}):\n")
-        else:
-            response_lines.append(f"### Recommended Government Schemes for You ({len(recommendations)}):\n")
-
-        for idx, rec in enumerate(recommendations, 1):
-            status_badge = f"**[{rec.status.value}]**"
-            response_lines.append(f"#### {idx}. {rec.scheme_name} {status_badge}")
-            response_lines.append(f"- **Summary**: {rec.summary}")
-
-            # Explain matched criteria
-            if rec.matched_conditions:
-                matched_str = ", ".join(f"{c.condition_name} ({c.actual_value})" for c in rec.matched_conditions)
-                response_lines.append(f"- **Matched Criteria**: {matched_str}")
-
-            # Explain unmet criteria
-            if rec.failed_conditions:
-                failed_str = "; ".join(c.reason for c in rec.failed_conditions)
-                response_lines.append(f"- **Unmet Criteria**: {failed_str}")
-
-            # Explain missing info
-            if rec.missing_fields:
-                missing_str = ", ".join(rec.missing_fields)
-                if lang == "hi":
-                    response_lines.append(f"- **अतिरिक्त जानकारी आवश्यक**: {missing_str}")
-                elif lang == "mr":
-                    response_lines.append(f"- **अधिक माहिती आवश्यक**: {missing_str}")
-                else:
-                    response_lines.append(f"- **Information Needed to Confirm**: {missing_str}")
-
-            # Add source link
-            if rec.official_url:
-                response_lines.append(f"- **Official Portal**: [{rec.official_url}]({rec.official_url})")
-
-            response_lines.append("")
-
-        final_text = "\n".join(response_lines).strip()
+        llm = get_llm_service()
+        final_text = llm.generate_explanation(
+            user_query=user_query,
+            detected_language=lang,
+            profile=profile,
+            recommendations=recommendations,
+            evidence=evidence
+        )
 
         messages = list(state.get("messages", []))
         messages.append({"role": "assistant", "content": final_text})
