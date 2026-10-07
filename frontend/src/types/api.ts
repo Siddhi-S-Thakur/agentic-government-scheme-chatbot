@@ -36,6 +36,24 @@ export interface ConditionResult {
   reason: string;
 }
 
+export interface FinancialBreakoutItem {
+  label: string;
+  value: string;
+  subtext?: string;
+  isHighlight?: boolean;
+  isSecondary?: boolean;
+}
+
+export interface ClarificationPrompt {
+  title: string;
+  description: string;
+  options: Array<{
+    label: string;
+    icon?: string;
+    value?: string;
+  }>;
+}
+
 // Matches backend EligibilityEvaluation / recommendation shape
 export interface SchemeRecommendation {
   scheme_id: string;
@@ -49,10 +67,17 @@ export interface SchemeRecommendation {
   top_evidence_snippet?: string;
   retrieved_sections?: string[];
   retrieval_score?: number;
-  // Optional extras the backend may supply
+  // Optional extras matching DESIGN.md & code.html
   department?: string;
   level?: string;
   description?: string;
+  match_percentage?: number;
+  category_badge?: string;
+  effective_benefit?: string;
+  financial_breakout?: FinancialBreakoutItem[];
+  required_documents?: Array<{ name: string; isVerified?: boolean }>;
+  clarification_prompt?: ClarificationPrompt;
+  registration_window?: string;
 }
 
 export interface ChatRequest {
@@ -84,7 +109,11 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  userName?: string;
+  userAvatar?: string;
+  syncNotice?: string;
   mcq_options?: MCQOption[];
   recommendations?: SchemeRecommendation[];
   isLoading?: boolean;
+  synthesizingDetails?: string;
 }

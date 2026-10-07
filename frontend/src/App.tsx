@@ -1,5 +1,5 @@
 import React from 'react';
-import '../i18n';
+import './i18n';
 import ChatInterface from './components/ChatInterface';
 
 const App: React.FC = () => {
