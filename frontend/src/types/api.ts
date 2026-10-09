@@ -83,6 +83,23 @@ export interface SchemeRecommendation {
 export interface ChatRequest {
   message: string;
   session_state?: SessionState;
+  session_id?: string;
+}
+
+export interface RegisterPayload {
+  username: string;
+  fullName: string;
+  password: string;
+  email?: string;
+  age?: number;
+  gender?: string;
+  occupation?: string;
+  state?: string;
+  district?: string;
+  annual_income?: number;
+  caste_category?: string;
+  landholding_acres?: number;
+  preferred_language?: Language;
 }
 
 export interface SessionState {

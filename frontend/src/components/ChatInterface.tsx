@@ -7,12 +7,14 @@ import type {
   UserProfile,
   SchemeRecommendation,
 } from '../types/api';
-import { sendChatMessage } from '../api/client';
+import { sendChatMessage, fetchChatHistory, fetchUserProfile, clearChatHistory, syncChatHistory } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import SchemeCard from './SchemeCard';
 import ProfileDossier from './ProfileDossier';
 import { HelpModal, VaultModal, DigiLockerModal, EditProfileModal } from './Modals';
+import AuthModal from './AuthPage';
 import CitizenDashboardView from './views/CitizenDashboardView';
 import RecommendationsView from './views/RecommendationsView';
 import ActiveApplicationsView, { type SavedApplication } from './views/ActiveApplicationsView';
@@ -27,168 +29,6 @@ function formatTime(d: Date): string {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-// Priya Sharma seed profile from screen.png / code.html
-const INITIAL_PROFILE: UserProfile = {
-  age: 28,
-  gender: 'Female',
-  occupation: 'Farmer / Agri-entrepreneur',
-  state: 'Maharashtra',
-  district: 'Nashik',
-  annual_income: 240000,
-};
-
-// Default seed recommendations
-const INITIAL_RECOMMENDATIONS: SchemeRecommendation[] = [
-  {
-    scheme_id: 'pm-kusum-b',
-    scheme_name: 'PM-KUSUM Component-B',
-    status: 'ELIGIBLE',
-    match_percentage: 98,
-    category_badge: 'Centrally Sponsored Scheme (CSS)',
-    department:
-      'Standalone Solar Agriculture Pump Subsidy Program • MNRE & Govt. of Maharashtra (Mahavitaran)',
-    effective_benefit: 'Up to 90% Aid',
-    matched_conditions: [
-      {
-        condition_name: 'Age & Residency',
-        description: '28 yrs (Req: 18-60) in Nashik, MH',
-        status: 'passed',
-        reason: '28 yrs (Req: 18-60) in Nashik, MH',
-      },
-      {
-        condition_name: 'Income Threshold',
-        description: '₹2.4L qualifies under Small Farmer',
-        status: 'passed',
-        reason: '₹2.4L qualifies under Small Farmer',
-      },
-      {
-        condition_name: 'Targeted Sector',
-        description: 'Irrigation electrification',
-        status: 'passed',
-        reason: 'Irrigation electrification',
-      },
-    ],
-    financial_breakout: [
-      {
-        label: 'Central + State Grant',
-        value: '60% Outright Subsidy',
-        subtext: '3HP to 7.5HP AC/DC Pumps',
-      },
-      {
-        label: 'Soft Bank Loan (NABARD)',
-        value: '30% Subsidized Credit',
-        subtext: 'Priority Sector Lending rates',
-        isSecondary: true,
-      },
-      {
-        label: 'Direct Farmer Contribution',
-        value: 'Only 10%',
-        subtext: 'Payable upon work allotment',
-        isHighlight: true,
-      },
-    ],
-    required_documents: [
-      { name: '7/12 & 8A Land Extract', isVerified: true },
-      { name: 'Aadhaar (e-KYC verified)', isVerified: true },
-      { name: 'Bank Passbook / DBT Link', isVerified: true },
-      { name: 'NOC from Discom', isVerified: false },
-    ],
-    registration_window: 'Registration window open till 31 Oct 2025',
-    official_url: 'https://kusum.online.gov.in',
-  },
-  {
-    scheme_id: 'stand-up-india',
-    scheme_name: 'Stand-Up India Scheme',
-    status: 'PARTIAL',
-    match_percentage: 75,
-    category_badge: 'Scheduled Commercial Bank Direct Facility',
-    department:
-      'Promoting Entrepreneurship for Women & SC/ST Enterprises • Ministry of Finance & SIDBI',
-    effective_benefit: '₹10 Lakh - ₹1 Crore',
-    clarification_prompt: {
-      title: 'Eligibility Checkpoint: Venture Classification',
-      description:
-        'Stand-Up India mandates that the enterprise must be a Greenfield project (first-time venture in manufacturing, services, agri-allied, or trading). Furthermore, woman entrepreneurs must hold at least 51% shareholding and controlling stake.',
-      options: [
-        {
-          label: 'Yes, it is a first-time (Greenfield) venture',
-          icon: 'done_all',
-        },
-        {
-          label: 'No, existing business expansion',
-          icon: 'domain_add',
-        },
-      ],
-    },
-    financial_breakout: [
-      {
-        label: 'Loan Type & Tenor',
-        value: 'Composite Loan (Term Loan + Working Capital)',
-        subtext: '7-year tenure with up to 18-month moratorium window.',
-      },
-      {
-        label: 'Margin Money Coverage',
-        value: 'Up to 15% with State Convergences',
-        subtext: 'Can be paired with Maharashtra Women Industrial Policy benefits.',
-      },
-    ],
-    official_url: 'https://www.standupmitra.in',
-  },
-];
-
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: 'msg-seed-1',
-    role: 'assistant',
-    userName: 'GovScheme AI Specialist',
-    timestamp: new Date(Date.now() - 120000),
-    content:
-      'Namaste Priya! I am your personalized GovScheme AI Assistant. Through your login session, I note your registered state as Maharashtra. To uncover customized grants and central subsidies, please share your profession, estimated household annual income, or key equipment needs (e.g., solar drip irrigation, SHG startup loans, rural housing).',
-  },
-  {
-    id: 'msg-seed-2',
-    role: 'user',
-    userName: 'You (Priya Sharma)',
-    userAvatar:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuB22gqerMV4DS0BZlwnOcERZGC4WRVGhVXJhZkuahW5DADWlmjyi5ur1jkb3TRJNBGWCfRKCn5AenBu9jLXrUU8U-XfqsxdYCeYq3ZupSF0nqXVbZahbfwAaAWnHyw3QQ_tODtN4CVZ1gKcbIqGEoPdi7sMNAF4draK0xKJq8GszO3F_2ChViHfXxPA0zxtCEO9HR33jmopzOypZnN8ePq_8-4GpWc77vuY6VZIJag',
-    timestamp: new Date(Date.now() - 60000),
-    content:
-      'I am a 28-year-old female farmer and agri-entrepreneur based in Nashik, Maharashtra. Our total family income is roughly ₹2.4 Lakhs annually. I am urgently looking for government subsidies on solar irrigation pumps and accessible credit guarantees for agro-processing.',
-  },
-  {
-    id: 'msg-seed-3',
-    role: 'assistant',
-    userName: 'GovScheme AI Specialist',
-    timestamp: new Date(),
-    syncNotice:
-      'Extracted 5 key parameters and synced with your Citizen Profile panel.',
-    content:
-      'Cross-referenced against 148 Central & State schemes: Located 1 fully verified high-match grant, and 1 high-value loan opportunity requiring single clarification.',
-    recommendations: INITIAL_RECOMMENDATIONS,
-  },
-];
-
-const INITIAL_APPLICATIONS: SavedApplication[] = [
-  {
-    id: 'pm-kusum-b',
-    schemeName: 'PM-KUSUM Component-B Solar Pump Subsidy',
-    department: 'MNRE & Govt. of Maharashtra (Mahavitaran)',
-    status: 'Drafted',
-    benefit: 'Up to 90% Capital Subsidy',
-    portalUrl: 'https://kusum.online.gov.in',
-    savedDate: 'Today',
-  },
-  {
-    id: 'stand-up-india',
-    schemeName: 'Stand-Up India Scheme for Women Enterprises',
-    department: 'Ministry of Finance & SIDBI',
-    status: 'Docs Verified',
-    benefit: '₹10 Lakh - ₹1 Crore Facility',
-    portalUrl: 'https://www.standupmitra.in',
-    savedDate: 'Yesterday',
-  },
-];
-
 const QUICK_CHIPS = [
   'Lakhpati Didi details',
   'PMAY-G Housing Subsidy',
@@ -199,22 +39,29 @@ const QUICK_CHIPS = [
 
 const ChatInterface: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { user, profile: authProfile, updateProfile: authUpdateProfile, refreshProfile, logout, isGuest, guestSessionId } = useAuth();
+
+  // Derive user display info from auth context
+  const userName = user?.full_name || 'Citizen';
+  const userInitials = userName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  const activeSessionId = user?.session_id || guestSessionId;
 
   // ── Navigation & Views State ─────────────────────────────
   const [activeTab, setActiveTab] = useState<string>('agentic-caseworker');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // ── Core Conversational & Profile State ──────────────────
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  // Start with clean dynamic state — no mock data
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
   const [mcqMode, setMcqMode] = useState<boolean>(true);
   const [fontScale, setFontScale] = useState<number>(1);
-  const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
+  const [profile, setProfile] = useState<UserProfile>(authProfile || {});
   const [sessionState, setSessionState] = useState<SessionState | undefined>(undefined);
-  const [allRecommendations, setAllRecommendations] = useState<SchemeRecommendation[]>(INITIAL_RECOMMENDATIONS);
-  const [savedApplications, setSavedApplications] = useState<SavedApplication[]>(INITIAL_APPLICATIONS);
+  const [allRecommendations, setAllRecommendations] = useState<SchemeRecommendation[]>([]);
+  const [savedApplications, setSavedApplications] = useState<SavedApplication[]>([]);
 
   // ── UI Feedback & Toasts ─────────────────────────────────
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -225,6 +72,7 @@ const ChatInterface: React.FC = () => {
   const [isVaultOpen, setIsVaultOpen] = useState(false);
   const [isDigiLockerOpen, setIsDigiLockerOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -249,6 +97,124 @@ const ChatInterface: React.FC = () => {
     }
   }, [messages, isLoading, activeTab]);
 
+  // ── Load conversation history & citizen profile from backend ─
+  useEffect(() => {
+    if (isGuest) {
+      // Guest mode: show a generic welcome if no messages exist
+      if (messages.length === 0) {
+        setMessages([
+          {
+            id: 'welcome-guest',
+            role: 'assistant',
+            userName: 'GovScheme AI Specialist',
+            timestamp: new Date(),
+            content:
+              'Namaste! Welcome to GovScheme AI, your personalized government scheme assistant. I can help you discover eligible grants, subsidies, and welfare schemes across Central and State programs. To get started, simply ask about any scheme you\'re interested in, or share your occupation, state, and age so I can recommend relevant schemes. 💡 Sign in anytime to save your conversation and profile.',
+          },
+        ]);
+      }
+      return;
+    }
+
+    // Logged-in user: session_id is active
+    const sessionId = user!.session_id;
+
+    // Check if there are active guest messages in memory that should be synced
+    const activeGuestMsgs = messages.filter(
+      (m) => !m.id.startsWith('welcome-') && !m.id.startsWith('restored-')
+    );
+
+    const loadUserData = async () => {
+      // 1. If citizen chatted as guest before signing in, persist those messages to their account!
+      if (activeGuestMsgs.length > 0) {
+        await syncChatHistory(
+          sessionId,
+          activeGuestMsgs.map((m) => ({ role: m.role, content: m.content }))
+        );
+        if (profile && Object.keys(profile).length > 0) {
+          try {
+            await authUpdateProfile(profile);
+          } catch {
+            // Ignore error if profile merge fails
+          }
+        }
+        showToast('Chat history & evaluated profile saved to your account!');
+      }
+
+      // 2. Load user profile from database
+      try {
+        const savedProfile = await fetchUserProfile(sessionId);
+        if (savedProfile && Object.keys(savedProfile).length > 0) {
+          setProfile(savedProfile);
+        } else if (authProfile && Object.keys(authProfile).length > 0) {
+          setProfile(authProfile);
+        }
+      } catch (err) {
+        console.warn('Could not load user profile:', err);
+      }
+
+      // 3. Load full conversation history from database
+      try {
+        const history = await fetchChatHistory(sessionId);
+        if (history.length > 0) {
+          const restored: Message[] = history.map((h, idx) => ({
+            id: `restored-${idx}`,
+            role: h.role as 'user' | 'assistant',
+            userName: h.role === 'user' ? `You (${userName})` : 'GovScheme AI Specialist',
+            content: h.content,
+            timestamp: new Date(),
+          }));
+          setMessages(restored);
+        } else {
+          // Fresh user session without prior history
+          const activeProfile =
+            authProfile && Object.keys(authProfile).length > 0 ? authProfile : profile;
+          const occ = activeProfile.occupation;
+          const st = activeProfile.state;
+          const summary = [occ, st ? `from ${st}` : ''].filter(Boolean).join(' ');
+
+          const welcomeText = summary
+            ? `Namaste ${userName}! Welcome back to GovScheme AI. Your registered profile has been loaded (${summary}). I can help you evaluate eligible grants, subsidies, and welfare schemes across Central and State programs. How can I assist you today?`
+            : `Namaste ${userName}! Welcome to GovScheme AI, your personalized government scheme assistant. I can help you discover eligible grants, subsidies, and welfare schemes across Central and State programs. To get started, please share your occupation, state, age, and estimated annual household income — or simply ask about any scheme you're interested in.`;
+
+          setMessages([
+            {
+              id: 'welcome-1',
+              role: 'assistant',
+              userName: 'GovScheme AI Specialist',
+              timestamp: new Date(),
+              content: welcomeText,
+            },
+          ]);
+        }
+      } catch (err) {
+        console.warn('Could not load chat history:', err);
+      }
+    };
+
+    loadUserData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.session_id, isGuest]);
+
+  // ── Handle Sign Out ──────────────────────────────────────
+  const handleLogout = useCallback(() => {
+    logout();
+    setMessages([
+      {
+        id: 'welcome-guest',
+        role: 'assistant',
+        userName: 'GovScheme AI Specialist',
+        timestamp: new Date(),
+        content:
+          'Namaste! Welcome to GovScheme AI, your personalized government scheme assistant. I can help you discover eligible grants, subsidies, and welfare schemes across Central and State programs. To get started, simply ask about any scheme you\'re interested in, or share your occupation, state, and age so I can recommend relevant schemes. 💡 Sign in anytime to save your conversation and profile.',
+      },
+    ]);
+    setProfile({});
+    setAllRecommendations([]);
+    setSessionState(undefined);
+    showToast('Signed out successfully.');
+  }, [logout, showToast]);
+
   // ── Language Switcher ────────────────────────────────────
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
@@ -268,9 +234,7 @@ const ChatInterface: React.FC = () => {
       const userMsg: Message = {
         id: genId(),
         role: 'user',
-        userName: 'You (Priya Sharma)',
-        userAvatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuB22gqerMV4DS0BZlwnOcERZGC4WRVGhVXJhZkuahW5DADWlmjyi5ur1jkb3TRJNBGWCfRKCn5AenBu9jLXrUU8U-XfqsxdYCeYq3ZupSF0nqXVbZahbfwAaAWnHyw3QQ_tODtN4CVZ1gKcbIqGEoPdi7sMNAF4draK0xKJq8GszO3F_2ChViHfXxPA0zxtCEO9HR33jmopzOypZnN8ePq_8-4GpWc77vuY6VZIJag',
+        userName: `You (${userName})`,
         content: trimmed,
         timestamp: new Date(),
       };
@@ -293,6 +257,7 @@ const ChatInterface: React.FC = () => {
         const response = await sendChatMessage({
           message: trimmed,
           session_state: currentSessionState,
+          session_id: isGuest ? undefined : activeSessionId,
         });
 
         if (response.session_state) {
@@ -361,7 +326,7 @@ const ChatInterface: React.FC = () => {
         inputRef.current?.focus();
       }
     },
-    [isLoading, sessionState, messages, profile, language, mcqMode]
+    [isLoading, sessionState, messages, profile, language, mcqMode, isGuest, activeSessionId]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -370,16 +335,20 @@ const ChatInterface: React.FC = () => {
   };
 
   // ── Reset Session ─────────────────────────────────────────
-  const handleResetSession = () => {
+  const handleResetSession = async () => {
     if (window.confirm('Do you want to reset current scheme analysis conversation?')) {
+      if (!isGuest && user?.session_id) {
+        await clearChatHistory(user.session_id);
+      }
       setMessages([
         {
           id: 'welcome-reset',
           role: 'assistant',
           userName: 'GovScheme AI Specialist',
           timestamp: new Date(),
-          content:
-            'Session conversation context refreshed. Your Aadhaar profile remains secure. How can I assist you with government schemes today?',
+          content: isGuest
+            ? 'Conversation cleared. What government schemes would you like to inquire about?'
+            : 'Conversation session refreshed. Your citizen profile remains securely stored in the database. What government schemes would you like to inquire about?',
         },
       ]);
       setSessionState(undefined);
@@ -477,11 +446,28 @@ const ChatInterface: React.FC = () => {
   };
 
   // ── Save Profile from Inline Editor ───────────────────────
-  const handleSaveProfile = (updated: UserProfile) => {
+  const handleSaveProfile = async (updated: UserProfile) => {
     setProfile(updated);
-    showToast('Citizen profile updated and verified');
+    if (user?.session_id) {
+      try {
+        await authUpdateProfile(updated);
+      } catch (err) {
+        console.warn('Could not save updated profile to database:', err);
+      }
+    }
+    showToast('Citizen profile updated & saved to database');
+
+    const updatedParts: string[] = [];
+    if (updated.age) updatedParts.push(`Age: ${updated.age}`);
+    if (updated.occupation) updatedParts.push(`Occupation: ${updated.occupation}`);
+    if (updated.state) updatedParts.push(`State: ${updated.state}${updated.district ? ` (${updated.district})` : ''}`);
+    if (updated.annual_income) updatedParts.push(`Annual Income: ₹${updated.annual_income.toLocaleString('en-IN')}`);
+    if (updated.caste_category) updatedParts.push(`Category: ${updated.caste_category}`);
+    if (updated.landholding_acres) updatedParts.push(`Land: ${updated.landholding_acres} Acres`);
+
+    const summaryText = updatedParts.length > 0 ? ` (${updatedParts.join(', ')})` : '';
     sendMessage(
-      `I have updated my profile details: Age ${updated.age ?? '28'}, Annual Income ₹${updated.annual_income ?? '240000'}, Landholding ${updated.landholding_acres ?? '2.5'} Acres in ${updated.state ?? 'Maharashtra'}. Please re-evaluate my eligible schemes.`
+      `I have updated my profile details${summaryText}. Please re-evaluate my eligible schemes.`
     );
   };
 
@@ -509,6 +495,10 @@ const ChatInterface: React.FC = () => {
           onOpenHelpline={() => setIsHelpOpen(true)}
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           onOpenDashboard={() => setActiveTab('citizen-dashboard')}
+          userName={userName}
+          isGuest={isGuest}
+          onLogout={handleLogout}
+          onSignIn={() => setIsAuthModalOpen(true)}
         />
 
         {/* Main Canvas */}
@@ -524,7 +514,19 @@ const ChatInterface: React.FC = () => {
                 <span className="strip-title">{t('appName', 'AI Scheme Orchestrator')}</span>
                 <span className="strip-dot">•</span>
                 <span className="strip-desc">{t('header.engineVersion', 'Engine v3.2 (Aadhaar & Jan Samarth Verified Registry)')}</span>
-                <span className="strip-badge">{t('header.liveContext', 'Live Context Engine')}</span>
+                {isGuest ? (
+                  <button
+                    type="button"
+                    className="strip-badge guest-mode-badge"
+                    onClick={() => setIsAuthModalOpen(true)}
+                    title="Click to sign in and save your chat history and profile"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 13, marginRight: 4 }}>lock_open</span>
+                    <span>Guest Mode • Sign In to Save</span>
+                  </button>
+                ) : (
+                  <span className="strip-badge">{t('header.liveContext', 'Live Context Engine')}</span>
+                )}
               </div>
 
               <div className="strip-actions">
@@ -558,6 +560,8 @@ const ChatInterface: React.FC = () => {
             {activeTab === 'citizen-dashboard' && (
               <CitizenDashboardView
                 profile={profile}
+                userName={userName}
+                eligibleCount={allRecommendations.filter((r) => r.status === 'ELIGIBLE').length}
                 onNavigateToChat={(q) => {
                   setActiveTab('agentic-caseworker');
                   if (q) sendMessage(q);
@@ -592,6 +596,7 @@ const ChatInterface: React.FC = () => {
 
             {activeTab === 'digilocker-dossier' && (
               <DigiLockerView
+                profile={profile}
                 onAttachDocument={handleAttachDocument}
                 onNavigateToChat={() => setActiveTab('agentic-caseworker')}
               />
@@ -626,7 +631,7 @@ const ChatInterface: React.FC = () => {
                             <div className="message-bubble-wrap">
                               <div className="message-meta">
                                 <span className="message-sender">
-                                  {isUser ? 'You (Priya Sharma)' : 'GovScheme AI Specialist'}
+                                  {isUser ? `You (${userName})` : 'GovScheme AI Specialist'}
                                 </span>
                                 <span className="message-time">{formatTime(msg.timestamp)}</span>
                               </div>
@@ -666,11 +671,8 @@ const ChatInterface: React.FC = () => {
 
                             {/* User Avatar */}
                             {isUser && (
-                              <div className="message-avatar-user">
-                                <img
-                                  src={msg.userAvatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuB22gqerMV4DS0BZlwnOcERZGC4WRVGhVXJhZkuahW5DADWlmjyi5ur1jkb3TRJNBGWCfRKCn5AenBu9jLXrUU8U-XfqsxdYCeYq3ZupSF0nqXVbZahbfwAaAWnHyw3QQ_tODtN4CVZ1gKcbIqGEoPdi7sMNAF4draK0xKJq8GszO3F_2ChViHfXxPA0zxtCEO9HR33jmopzOypZnN8ePq_8-4GpWc77vuY6VZIJag'}
-                                  alt="User Profile"
-                                />
+                              <div className="message-avatar-user user-initials-avatar">
+                                {userInitials}
                               </div>
                             )}
                           </div>
@@ -829,6 +831,17 @@ const ChatInterface: React.FC = () => {
                         <span>{t('chat.encryptedFootnote', 'End-to-End Encrypted via Aadhaar Virtual ID')}</span>
                       </span>
                       <span>{t('chat.gazetteFootnote', 'Responses generated using verified government gazettes')}</span>
+                      {isGuest && (
+                        <button
+                          type="button"
+                          className="footnote-signin-link"
+                          onClick={() => setIsAuthModalOpen(true)}
+                          title="Save this conversation to an account"
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>bookmark</span>
+                          <span>Save chat history</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </section>
@@ -838,11 +851,14 @@ const ChatInterface: React.FC = () => {
                 {/* ==================================================== */}
                 <ProfileDossier
                   profile={profile}
-                  onRefresh={() => showToast('Profile synced with Aadhaar Registry')}
+                  onRefresh={() => {
+                    refreshProfile();
+                    showToast('Profile synced with database');
+                  }}
                   onPromptAttribute={() => setIsEditProfileOpen(true)}
                   onOpenVaultModal={() => setIsVaultOpen(true)}
                   onOpenEditProfile={() => setIsEditProfileOpen(true)}
-                  eligibleCount={allRecommendations.filter((r) => r.status === 'ELIGIBLE').length || 2}
+                  eligibleCount={allRecommendations.filter((r) => r.status === 'ELIGIBLE').length}
                 />
               </div>
             )}
@@ -873,6 +889,11 @@ const ChatInterface: React.FC = () => {
         onClose={() => setIsEditProfileOpen(false)}
         profile={profile}
         onSaveProfile={handleSaveProfile}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
       />
     </div>
   );

@@ -1,57 +1,67 @@
 import React from 'react';
+import type { UserProfile } from '../../types/api';
 
 interface DigiLockerViewProps {
+  profile?: UserProfile;
   onAttachDocument: (docName: string, dataAttrs?: Record<string, unknown>) => void;
   onNavigateToChat: () => void;
 }
 
-const DOCUMENTS = [
-  {
-    id: 'aadhaar',
-    title: 'Aadhaar e-KYC Card',
-    issuer: 'Unique Identification Authority of India (UIDAI)',
-    docNumber: 'XXXX-XXXX-9124',
-    date: 'Verified 14 Jan 2025',
-    status: 'Verified',
-    icon: 'verified_user',
-    dataAttrs: { gender: 'Female', age: 28 },
-  },
-  {
-    id: 'land-extract',
-    title: '7/12 & 8A Land Extract Record',
-    issuer: 'Revenue Department • Govt. of Maharashtra (MahaBhulekh)',
-    docNumber: 'Gat No. 184/2 · Nashik District',
-    date: 'Verified 02 Feb 2025',
-    status: 'Verified',
-    icon: 'landscape',
-    dataAttrs: { landholding_acres: 2.5, state: 'Maharashtra', district: 'Nashik' },
-  },
-  {
-    id: 'bank-passbook',
-    title: 'NPCI DBT Linked Bank Account',
-    issuer: 'State Bank of India • Chandwad Branch',
-    docNumber: 'A/C Ending •••• 4812 (IFSC: SBIN000124)',
-    date: 'Active Aadhaar Seeding',
-    status: 'DBT Enabled',
-    icon: 'account_balance',
-    dataAttrs: {},
-  },
-  {
-    id: 'income-cert',
-    title: 'Tahsildar Income Assessment Certificate',
-    issuer: 'Revenue Office • Sub-Division Nashik',
-    docNumber: 'REV-MH-2025-882194',
-    date: 'Annual Income ₹2,40,000 Certified',
-    status: 'Verified',
-    icon: 'receipt_long',
-    dataAttrs: { annual_income: 240000 },
-  },
-];
-
 const DigiLockerView: React.FC<DigiLockerViewProps> = ({
+  profile = {},
   onAttachDocument,
   onNavigateToChat,
 }) => {
+  const documents = [
+    {
+      id: 'aadhaar',
+      title: 'Aadhaar e-KYC Card',
+      issuer: 'Unique Identification Authority of India (UIDAI)',
+      docNumber: 'XXXX-XXXX-8921',
+      date: 'Digital Verified',
+      status: 'Verified',
+      icon: 'verified_user',
+      dataAttrs: {
+        gender: profile.gender || 'Not specified',
+        age: profile.age || 'Not specified',
+      },
+    },
+    {
+      id: 'land-extract',
+      title: '7/12 & 8A Land Extract Record',
+      issuer: `Revenue Department • Govt. of ${profile.state || 'State'}`,
+      docNumber: `Land Registry · ${profile.district || 'District'}`,
+      date: 'Digital Verified',
+      status: 'Verified',
+      icon: 'landscape',
+      dataAttrs: {
+        landholding_acres: profile.landholding_acres || 0,
+        state: profile.state || 'Not specified',
+        district: profile.district || 'Not specified',
+      },
+    },
+    {
+      id: 'bank-passbook',
+      title: 'NPCI DBT Linked Bank Account',
+      issuer: 'National Payments Corporation of India (NPCI)',
+      docNumber: 'A/C Linked (DBT Enabled)',
+      date: 'Active Aadhaar Seeding',
+      status: 'DBT Enabled',
+      icon: 'account_balance',
+      dataAttrs: {},
+    },
+    {
+      id: 'income-cert',
+      title: 'Tahsildar Income Assessment Certificate',
+      issuer: `Revenue Office • ${profile.district || profile.state || 'Regional Sub-Division'}`,
+      docNumber: 'REV-CERT-OFFICIAL',
+      date: profile.annual_income ? `Annual Income ₹${profile.annual_income.toLocaleString('en-IN')} Certified` : 'Income Record',
+      status: 'Verified',
+      icon: 'receipt_long',
+      dataAttrs: { annual_income: profile.annual_income || 0 },
+    },
+  ];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
       {/* Header Banner */}
@@ -62,14 +72,14 @@ const DigiLockerView: React.FC<DigiLockerViewProps> = ({
           </span>
           <span className="strip-title">National DigiLocker Dossier Vault</span>
           <span className="strip-dot">•</span>
-          <span className="strip-desc">Tamper-evident legal credentials linked via Aadhaar e-KYC</span>
+          <span className="strip-desc">Tamper-evident legal credentials linked to your session</span>
         </div>
 
         <button
           type="button"
           className="strip-btn"
           onClick={() => {
-            alert('DigiLocker API successfully synced 4 issued documents.');
+            alert('DigiLocker documents successfully synchronized.');
           }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
@@ -81,7 +91,7 @@ const DigiLockerView: React.FC<DigiLockerViewProps> = ({
 
       {/* Grid of Verified Documents */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
-        {DOCUMENTS.map((doc) => (
+        {documents.map((doc) => (
           <div key={doc.id} className="scheme-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>

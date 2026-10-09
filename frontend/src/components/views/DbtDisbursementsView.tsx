@@ -1,6 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import type { UserProfile } from '../../types/api';
 
-const DbtDisbursementsView: React.FC = () => {
+interface DbtDisbursementsViewProps {
+  profile?: UserProfile;
+  userName?: string;
+  onNavigateToChat?: (query?: string) => void;
+}
+
+const DbtDisbursementsView: React.FC<DbtDisbursementsViewProps> = ({
+  profile = {},
+  userName = 'Citizen',
+  onNavigateToChat,
+}) => {
+  const [bankLinked, setBankLinked] = useState(false);
+  const [accountNumber, setAccountNumber] = useState('');
+  const [bankName, setBankName] = useState('State Bank of India');
+  const [isLinking, setIsLinking] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  const handleLinkBank = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accountNumber.trim()) return;
+    setIsLinking(true);
+    setTimeout(() => {
+      setBankLinked(true);
+      setIsLinking(false);
+      setFeedback(`Account •••• ${accountNumber.slice(-4)} successfully verified via NPCI Aadhaar Seeding Gateway.`);
+    }, 800);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%' }}>
       {/* Top Header */}
@@ -9,39 +37,68 @@ const DbtDisbursementsView: React.FC = () => {
           <span className="material-symbols-outlined" style={{ color: 'var(--on-tertiary-container)' }}>
             account_balance_wallet
           </span>
-          <span className="strip-title">Direct Benefit Transfer (DBT) Highway</span>
+          <span className="strip-title">Direct Benefit Transfer (DBT) Portal</span>
           <span className="strip-dot">•</span>
-          <span className="strip-desc">Public Financial Management System (PFMS) &amp; NPCI Seeding</span>
+          <span className="strip-desc">
+            NPCI Aadhaar Seeding &amp; Public Financial Management System (PFMS)
+          </span>
         </div>
 
         <button
           type="button"
           className="strip-btn"
-          onClick={() => alert('DBT Seeding status verified with NPCI Gateway: ACTIVE')}
+          onClick={() => {
+            setFeedback(
+              bankLinked
+                ? 'NPCI Aadhaar Mapper status: ACTIVE & SEEDED.'
+                : 'NPCI Aadhaar Mapper status: Please link your Aadhaar-seeded bank account below.'
+            );
+          }}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
-            check_circle
+            verified_user
           </span>
-          <span>Check NPCI Mapper Live</span>
+          <span>Verify NPCI Status</span>
         </button>
       </div>
+
+      {feedback && (
+        <div className="provenance-strip" style={{ borderColor: 'var(--tertiary)' }}>
+          <div className="strip-status">
+            <span className="material-symbols-outlined" style={{ color: 'var(--on-tertiary-container)' }}>
+              info
+            </span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--on-surface)' }}>{feedback}</span>
+          </div>
+          <button
+            type="button"
+            className="strip-btn"
+            style={{ padding: '0.25rem 0.5rem' }}
+            onClick={() => setFeedback(null)}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+              close
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* 3 Status Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
         <div className="scheme-card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>
-              NPCI Aadhaar Mapper
+              Beneficiary Name
             </span>
-            <span className="material-symbols-outlined" style={{ color: 'var(--on-tertiary-container)' }}>
-              verified_user
+            <span className="material-symbols-outlined" style={{ color: 'var(--secondary)' }}>
+              person
             </span>
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--on-tertiary-container)', margin: '0.5rem 0' }}>
-            Active &amp; Seeded
+          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', margin: '0.5rem 0' }}>
+            {userName}
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--outline)', margin: 0 }}>
-            Mapped to State Bank of India • Chandwad Branch
+            Jurisdiction: {profile.district ? `${profile.district}, ` : ''}{profile.state || 'National Registry'}
           </p>
         </div>
 
@@ -50,105 +107,144 @@ const DbtDisbursementsView: React.FC = () => {
             <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>
               Primary DBT Account
             </span>
-            <span className="material-symbols-outlined" style={{ color: 'var(--secondary)' }}>
+            <span className="material-symbols-outlined" style={{ color: bankLinked ? 'var(--on-tertiary-container)' : 'var(--outline)' }}>
               account_balance
             </span>
           </div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', margin: '0.5rem 0' }}>
-            SBI •••• 4812
+          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: bankLinked ? 'var(--on-tertiary-container)' : 'var(--primary)', margin: '0.5rem 0' }}>
+            {bankLinked ? `${bankName} •••• ${accountNumber.slice(-4)}` : 'Not Linked Yet'}
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--outline)', margin: 0 }}>
-            Jan Dhan / Priority Account Enabled
+            {bankLinked ? 'Aadhaar Seeding Active' : 'Enter bank details below to link'}
           </p>
         </div>
 
         <div className="scheme-card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', fontWeight: 600 }}>
-              Cumulative DBT Aid
+              DBT Scheme Eligibility
             </span>
             <span className="material-symbols-outlined" style={{ color: 'var(--on-tertiary-container)' }}>
               payments
             </span>
           </div>
           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', margin: '0.5rem 0' }}>
-            ₹34,000 Total
+            {profile.occupation ? `${profile.occupation}` : 'Profile Active'}
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--outline)', margin: 0 }}>
-            Received across 17 installments
+            Direct disbursement available on eligible grants
           </p>
         </div>
       </div>
 
-      {/* Disbursement Log History */}
-      <div className="scheme-card" style={{ padding: '1.5rem' }}>
-        <h3 style={{ fontFamily: 'var(--font-headline)', fontSize: '1.125rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '1rem' }}>
-          Recent DBT Subsidies &amp; Direct Deposits
-        </h3>
+      {/* Account Seeding Form / Status */}
+      {!bankLinked ? (
+        <div className="scheme-card" style={{ padding: '1.5rem' }}>
+          <h3 style={{ fontFamily: 'var(--font-headline)', fontSize: '1.125rem', fontWeight: 700, color: 'var(--primary)', marginBottom: '0.5rem' }}>
+            Link Aadhaar-Seeded Bank Account for Direct Benefit Transfer
+          </h3>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--on-surface-variant)', marginBottom: '1.25rem' }}>
+            Central and State DBT subsidies are credited directly into your Aadhaar-mapped bank account through the NPCI gateway.
+          </p>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--outline-variant)', textAlign: 'left', color: 'var(--on-surface-variant)' }}>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Disbursement Date</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Scheme Authority</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>UTR / Reference</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Amount</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>PFMS Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: '1px solid rgba(226, 232, 240, 0.7)' }}>
-                <td style={{ padding: '0.75rem 0.5rem' }}>18 Jun 2025</td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, color: 'var(--primary)' }}>
-                  PM-KISAN Samman Nidhi 17th Installment
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', color: 'var(--outline)' }}>
-                  PFMS/20250618/90218491
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700, color: 'var(--on-tertiary-container)' }}>
-                  ₹2,000.00
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem' }}>
-                  <span className="match-pill-verified">Credited to SBI</span>
-                </td>
-              </tr>
+          <form onSubmit={handleLinkBank} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '560px' }}>
+            <div className="auth-field">
+              <label htmlFor="dbt-bank-name" className="auth-label">
+                <span className="material-symbols-outlined">account_balance</span>
+                Bank Name
+              </label>
+              <select
+                id="dbt-bank-name"
+                className="auth-input"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+              >
+                <option value="State Bank of India">State Bank of India (SBI)</option>
+                <option value="Bank of Baroda">Bank of Baroda</option>
+                <option value="Punjab National Bank">Punjab National Bank</option>
+                <option value="Canara Bank">Canara Bank</option>
+                <option value="HDFC Bank">HDFC Bank</option>
+                <option value="ICICI Bank">ICICI Bank</option>
+                <option value="Maharashtra Gramin Bank">Maharashtra Gramin Bank / Regional Rural Bank</option>
+                <option value="Other Scheduled Bank">Other Scheduled Bank</option>
+              </select>
+            </div>
 
-              <tr style={{ borderBottom: '1px solid rgba(226, 232, 240, 0.7)' }}>
-                <td style={{ padding: '0.75rem 0.5rem' }}>28 Feb 2025</td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, color: 'var(--primary)' }}>
-                  PM-KISAN Samman Nidhi 16th Installment
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', color: 'var(--outline)' }}>
-                  PFMS/20250228/88319402
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700, color: 'var(--on-tertiary-container)' }}>
-                  ₹2,000.00
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem' }}>
-                  <span className="match-pill-verified">Credited to SBI</span>
-                </td>
-              </tr>
+            <div className="auth-field">
+              <label htmlFor="dbt-account-no" className="auth-label">
+                <span className="material-symbols-outlined">pin</span>
+                Bank Account Number
+              </label>
+              <input
+                id="dbt-account-no"
+                type="text"
+                className="auth-input"
+                placeholder="Enter 11 to 16 digit account number"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                required
+              />
+            </div>
 
-              <tr>
-                <td style={{ padding: '0.75rem 0.5rem' }}>15 Jan 2025</td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, color: 'var(--primary)' }}>
-                  Namo Shetkari Mahasanman Nidhi (Maharashtra)
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', color: 'var(--outline)' }}>
-                  MHDBT/20250115/44120981
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700, color: 'var(--on-tertiary-container)' }}>
-                  ₹2,000.00
-                </td>
-                <td style={{ padding: '0.75rem 0.5rem' }}>
-                  <span className="match-pill-verified">Credited to SBI</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+              <button
+                type="submit"
+                className="chat-send-btn"
+                disabled={isLinking}
+              >
+                <span className="material-symbols-outlined">link</span>
+                <span>{isLinking ? 'Verifying NPCI Seeding...' : 'Link & Verify DBT Seeding'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="strip-btn"
+                onClick={() => onNavigateToChat?.('Which government schemes offer direct benefit transfer for my occupation?')}
+              >
+                <span className="material-symbols-outlined">help</span>
+                <span>Ask AI About DBT Subsidies</span>
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
+      ) : (
+        /* Verified Account Banner */
+        <div className="scheme-card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 28, color: 'var(--on-tertiary-container)' }}>
+              check_circle
+            </span>
+            <div>
+              <h3 style={{ fontFamily: 'var(--font-headline)', fontSize: '1.125rem', fontWeight: 700, color: 'var(--primary)', margin: 0 }}>
+                Aadhaar Seeding Active on DBT Highway
+              </h3>
+              <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', margin: '0.25rem 0 0' }}>
+                Bank Account •••• {accountNumber.slice(-4)} ({bankName}) is linked for Public Financial Management System (PFMS) deposits.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              type="button"
+              className="chat-send-btn"
+              onClick={() => onNavigateToChat?.('Check DBT subsidy disbursements and status for my eligible schemes')}
+            >
+              <span className="material-symbols-outlined">smart_toy</span>
+              <span>Check Eligible Subsidies via AI Caseworker</span>
+            </button>
+
+            <button
+              type="button"
+              className="strip-btn"
+              onClick={() => setBankLinked(false)}
+            >
+              <span className="material-symbols-outlined">swap_horiz</span>
+              <span>Change Bank Account</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

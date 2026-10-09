@@ -10,8 +10,10 @@ interface HeaderProps {
   onOpenHelpline: () => void;
   onToggleSidebar?: () => void;
   onOpenDashboard?: () => void;
-  userAvatarUrl?: string;
   userName?: string;
+  isGuest?: boolean;
+  onLogout?: () => void;
+  onSignIn?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -22,10 +24,13 @@ const Header: React.FC<HeaderProps> = ({
   onOpenHelpline,
   onToggleSidebar,
   onOpenDashboard,
-  userAvatarUrl = 'https://lh3.googleusercontent.com/aida/AEtjO1XJvmXuP3wOf8CwGdCMqkbDCrXFQHxT6GzUgfW0RTyz4xV8UJtv6k97SWtCOShgULogpynYAGlkTjmu8bEpAU0nCCOgShDywZhPc7YPKoj1bLpW_C6yDlrUJcmEUDWH40FnNda91JXbaxSROe0uPDYGzLM_S_czTlaXUMLjlwxrWr3Eug8BRlNzzBeIyFlxfEtXgXwB4RbC8Rif-Ch5sMufbZXLTy_2nbdt4pRevGUd',
-  userName = 'Priya Sharma',
+  userName = 'Citizen',
+  isGuest = false,
+  onLogout,
+  onSignIn,
 }) => {
   const { t } = useTranslation();
+  const initials = userName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <header className="gov-header">
@@ -108,30 +113,47 @@ const Header: React.FC<HeaderProps> = ({
           <span style={{ display: 'inline' }}>{t('header.help', 'Help & Helplines')}</span>
         </button>
 
-        {/* Profile Avatar */}
-        <div
-          className="header-avatar-wrap"
-          title={`Logged in as ${userName} — Click to view Dashboard`}
-          style={{ cursor: 'pointer' }}
-          onClick={onOpenDashboard}
-        >
-          <img
-            src={userAvatarUrl}
-            alt={userName}
-            className="header-avatar"
-            onError={(e) => {
-              (e.currentTarget as HTMLElement).style.display = 'none';
-              const parent = e.currentTarget.parentElement;
-              if (parent && !parent.querySelector('.avatar-fallback')) {
-                const span = document.createElement('div');
-                span.className = 'header-avatar avatar-fallback';
-                span.innerText = 'PS';
-                parent.insertBefore(span, parent.firstChild);
-              }
-            }}
-          />
-          <span className="header-avatar-badge" />
-        </div>
+        {isGuest ? (
+          /* ── Guest: Show Sign In button ── */
+          <button
+            type="button"
+            className="header-signin-btn"
+            onClick={onSignIn}
+            title="Sign in to save your chat history"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>
+            <span>Sign In</span>
+          </button>
+        ) : (
+          /* ── Logged in: Show avatar + Sign Out ── */
+          <>
+            {/* Profile Avatar with Initials */}
+            <div
+              className="header-avatar-wrap"
+              title={`Logged in as ${userName} — Click to view Dashboard`}
+              style={{ cursor: 'pointer' }}
+              onClick={onOpenDashboard}
+            >
+              <div className="header-avatar avatar-initials">
+                {initials}
+              </div>
+              <span className="header-avatar-badge" />
+            </div>
+
+            {/* Sign Out Button */}
+            {onLogout && (
+              <button
+                type="button"
+                className="header-logout-btn"
+                onClick={onLogout}
+                title="Sign Out"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
+                <span>Sign Out</span>
+              </button>
+            )}
+          </>
+        )}
       </div>
     </header>
   );

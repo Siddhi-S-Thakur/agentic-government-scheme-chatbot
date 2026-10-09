@@ -24,9 +24,9 @@ class AgentNodeHandlers:
         # Incrementally update profile using multilingual extractor
         updated_profile = ProfileExtractor.extract_from_text(query, existing_profile)
 
-        # Detect active language and interaction mode from state or profile
-        lang = state.get("detected_language") or updated_profile.preferred_language or "en"
-        mode = state.get("interaction_mode") or updated_profile.interaction_mode or "text"
+        # Detect active language and interaction mode from profile or state
+        lang = updated_profile.preferred_language or state.get("detected_language") or "en"
+        mode = updated_profile.interaction_mode or state.get("interaction_mode") or "text"
         updated_profile.preferred_language = lang
         updated_profile.interaction_mode = mode
 

@@ -413,6 +413,10 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<UserProfile>(profile);
 
+  React.useEffect(() => {
+    setFormData(profile);
+  }, [profile, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {

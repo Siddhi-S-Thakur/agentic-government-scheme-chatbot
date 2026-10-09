@@ -31,7 +31,7 @@ function calculateCompletion(profile: UserProfile): { pct: number; pendingCount:
 
   const pct = Math.round((filled / trackedKeys.length) * 100);
   const pendingCount = trackedKeys.length - filled;
-  return { pct: Math.max(pct, 15), pendingCount };
+  return { pct, pendingCount };
 }
 
 function formatIncome(inc?: number): string {
@@ -48,21 +48,21 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
   onPromptAttribute,
   onOpenVaultModal,
   onOpenEditProfile,
-  eligibleCount = 2,
+  eligibleCount = 0,
 }) => {
   const { pct, pendingCount } = calculateCompletion(profile);
 
-  // Fallbacks from seed/state
-  const ageDisplay = profile.age ? `${profile.age} Years` : '28 Years';
-  const genderDisplay = profile.gender || 'Female';
-  const occDisplay = profile.occupation || 'Farmer / Agri-entrepreneur';
+  // Dynamic values derived from actual profile (no mock fallbacks)
+  const ageDisplay = profile.age ? `${profile.age} Years` : null;
+  const genderDisplay = profile.gender || null;
+  const occDisplay = profile.occupation || null;
   const stateDistDisplay = profile.state
     ? `${profile.state}${profile.district ? ` (${profile.district})` : ''}`
-    : 'Maharashtra (Nashik)';
-  const incomeDisplay = profile.annual_income !== undefined
+    : null;
+  const incomeDisplay = profile.annual_income !== undefined && profile.annual_income !== null
     ? formatIncome(profile.annual_income)
-    : '₹2,40,000 / year';
-  const landDisplay = profile.landholding_acres !== undefined
+    : null;
+  const landDisplay = profile.landholding_acres !== undefined && profile.landholding_acres !== null
     ? `${profile.landholding_acres} Acres`
     : null;
   const casteDisplay = profile.caste_category || null;
@@ -75,10 +75,10 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
         <div className="dossier-header">
           <div>
             <div className="dossier-title-row">
-              <h2 className="dossier-title">Your Profile</h2>
-              <span className="dossier-badge-live">Real-time</span>
+              <h2 className="dossier-title">Citizen Profile</h2>
+              <span className="dossier-badge-live">Saved</span>
             </div>
-            <p className="dossier-subtitle">Extracted organically by AI Orchestrator</p>
+            <p className="dossier-subtitle">Synchronized with your registered account</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             <button
@@ -109,92 +109,152 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
         {/* Profile Completion Index Bar */}
         <div className="profile-completion-box">
           <div className="completion-label-row">
-            <span className="completion-label">Profile Completion Index</span>
-            <span className="completion-pct">{pct}% Ready</span>
+            <span className="completion-label">Eligibility Match Readiness</span>
+            <span className="completion-pct">{pct}% Complete</span>
           </div>
           <div className="completion-bar-track">
             <div className="completion-bar-fill" style={{ width: `${pct}%` }} />
           </div>
           <span className="completion-hint">
             {pendingCount > 0
-              ? `Fill ${pendingCount} pending field${pendingCount > 1 ? 's' : ''} for 100% scheme qualification`
-              : 'All core eligibility parameters captured'}
+              ? `${pendingCount} parameter${pendingCount > 1 ? 's' : ''} pending for comprehensive scheme matching`
+              : 'All primary parameters recorded in your profile'}
           </span>
         </div>
 
         {/* Profile Attributes List */}
         <div className="profile-attributes-list">
-          {/* Confirmed: Age */}
-          <div className="profile-attr-row">
+          {/* Age */}
+          <div className={`profile-attr-row ${ageDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
-                <span className="material-symbols-outlined">check_circle</span>
+                <span className="material-symbols-outlined">
+                  {ageDisplay ? 'check_circle' : 'pending'}
+                </span>
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Age</span>
-                <span className="attr-value">{ageDisplay}</span>
+                <span className="attr-value">{ageDisplay || 'Not specified'}</span>
               </div>
             </div>
-            <span className="attr-badge">From chat</span>
+            {ageDisplay ? (
+              <span className="attr-badge">Verified</span>
+            ) : (
+              <button
+                type="button"
+                className="attr-ask-btn"
+                onClick={onOpenEditProfile}
+              >
+                + Add
+              </button>
+            )}
           </div>
 
-          {/* Confirmed: Gender */}
-          <div className="profile-attr-row">
+          {/* Gender */}
+          <div className={`profile-attr-row ${genderDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
-                <span className="material-symbols-outlined">check_circle</span>
+                <span className="material-symbols-outlined">
+                  {genderDisplay ? 'check_circle' : 'pending'}
+                </span>
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Gender</span>
-                <span className="attr-value">{genderDisplay}</span>
+                <span className="attr-value">{genderDisplay || 'Not specified'}</span>
               </div>
             </div>
-            <span className="attr-badge">Aadhaar verified</span>
+            {genderDisplay ? (
+              <span className="attr-badge">Recorded</span>
+            ) : (
+              <button
+                type="button"
+                className="attr-ask-btn"
+                onClick={onOpenEditProfile}
+              >
+                + Add
+              </button>
+            )}
           </div>
 
-          {/* Confirmed: Occupation */}
-          <div className="profile-attr-row">
+          {/* Occupation */}
+          <div className={`profile-attr-row ${occDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
-                <span className="material-symbols-outlined">check_circle</span>
+                <span className="material-symbols-outlined">
+                  {occDisplay ? 'check_circle' : 'pending'}
+                </span>
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Occupation</span>
-                <span className="attr-value">{occDisplay}</span>
+                <span className="attr-value">{occDisplay || 'Not specified'}</span>
               </div>
             </div>
-            <span className="attr-badge">From chat</span>
+            {occDisplay ? (
+              <span className="attr-badge">Recorded</span>
+            ) : (
+              <button
+                type="button"
+                className="attr-ask-btn"
+                onClick={onOpenEditProfile}
+              >
+                + Add
+              </button>
+            )}
           </div>
 
-          {/* Confirmed: State & District */}
-          <div className="profile-attr-row">
+          {/* State & District */}
+          <div className={`profile-attr-row ${stateDistDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
-                <span className="material-symbols-outlined">check_circle</span>
+                <span className="material-symbols-outlined">
+                  {stateDistDisplay ? 'check_circle' : 'pending'}
+                </span>
               </div>
               <div className="attr-meta">
                 <span className="attr-name">State &amp; District</span>
-                <span className="attr-value">{stateDistDisplay}</span>
+                <span className="attr-value">{stateDistDisplay || 'Not specified'}</span>
               </div>
             </div>
-            <span className="attr-badge">Geo-tagged</span>
+            {stateDistDisplay ? (
+              <span className="attr-badge">Jurisdiction</span>
+            ) : (
+              <button
+                type="button"
+                className="attr-ask-btn"
+                onClick={onOpenEditProfile}
+              >
+                + Add
+              </button>
+            )}
           </div>
 
-          {/* Confirmed: Annual Household Income */}
-          <div className="profile-attr-row">
+          {/* Annual Household Income */}
+          <div className={`profile-attr-row ${incomeDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
-                <span className="material-symbols-outlined">check_circle</span>
+                <span className="material-symbols-outlined">
+                  {incomeDisplay ? 'check_circle' : 'pending'}
+                </span>
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Annual Household Income</span>
-                <span className="attr-value">{incomeDisplay}</span>
+                <span className="attr-value">{incomeDisplay || 'Not specified'}</span>
               </div>
             </div>
-            <span className="attr-badge highlight">Marginal</span>
+            {incomeDisplay ? (
+              <span className="attr-badge highlight">Declared</span>
+            ) : (
+              <button
+                type="button"
+                className="attr-ask-btn"
+                onClick={onOpenEditProfile}
+              >
+                + Add
+              </button>
+            )}
           </div>
 
-          {/* Land Holding (Pending or Confirmed) */}
+          {/* Land Holding */}
           <div className={`profile-attr-row ${landDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
@@ -204,23 +264,23 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Land Holding</span>
-                <span className="attr-value">{landDisplay || 'Unknown (e.g. 2.5 Acres)'}</span>
+                <span className="attr-value">{landDisplay || 'Not specified (optional)'}</span>
               </div>
             </div>
-            {!landDisplay ? (
+            {landDisplay ? (
+              <span className="attr-badge">Recorded</span>
+            ) : (
               <button
                 type="button"
                 className="attr-ask-btn"
                 onClick={() => onPromptAttribute?.('agricultural landholding')}
               >
-                Ask User
+                Ask AI
               </button>
-            ) : (
-              <span className="attr-badge">Verified</span>
             )}
           </div>
 
-          {/* Social Category (Pending or Confirmed) */}
+          {/* Social Category */}
           <div className={`profile-attr-row ${casteDisplay ? '' : 'pending'}`}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
               <div className="attr-icon-box">
@@ -230,19 +290,19 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
               </div>
               <div className="attr-meta">
                 <span className="attr-name">Social Category</span>
-                <span className="attr-value">{casteDisplay || 'General / OBC / SC / ST'}</span>
+                <span className="attr-value">{casteDisplay || 'Not specified'}</span>
               </div>
             </div>
-            {!casteDisplay ? (
+            {casteDisplay ? (
+              <span className="attr-badge">Declared</span>
+            ) : (
               <button
                 type="button"
                 className="attr-ask-btn"
-                onClick={() => onPromptAttribute?.('social category (General, OBC, SC, ST)')}
+                onClick={() => onPromptAttribute?.('social category (General, OBC, SC, ST, EWS)')}
               >
-                Ask User
+                Ask AI
               </button>
-            ) : (
-              <span className="attr-badge">Declared</span>
             )}
           </div>
         </div>
@@ -252,37 +312,39 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
           <div className="dbt-readiness-head">
             <span className="dbt-readiness-title">
               <span className="material-symbols-outlined">account_balance</span>
-              DBT Highway Readiness
+              DBT Highway Connectivity
             </span>
-            <span className="dbt-readiness-pct">100% Linked</span>
+            <span className="dbt-readiness-pct">
+              {pct >= 60 ? 'Profile Ready' : 'Setup in Progress'}
+            </span>
           </div>
           <div className="dbt-pillars-grid">
             <div className="dbt-pillar-item">
               <span className="material-symbols-outlined">verified_user</span>
-              <span className="pillar-name">Aadhaar</span>
-              <span className="pillar-sub">Active</span>
+              <span className="pillar-name">Citizen Account</span>
+              <span className="pillar-sub">Active Session</span>
             </div>
             <div className="dbt-pillar-item">
               <span className="material-symbols-outlined">payments</span>
-              <span className="pillar-name">Jan Dhan</span>
-              <span className="pillar-sub">Bank Linked</span>
+              <span className="pillar-name">DBT Seeding</span>
+              <span className="pillar-sub">NPCI Ready</span>
             </div>
             <div className="dbt-pillar-item">
               <span className="material-symbols-outlined">cloud_done</span>
-              <span className="pillar-name">DigiLocker</span>
-              <span className="pillar-sub">4 Dossiers</span>
+              <span className="pillar-name">Profile Context</span>
+              <span className="pillar-sub">{pct}% Mapped</span>
             </div>
           </div>
         </div>
 
-        {/* Kisan Advisory Helpline Support Tile */}
+        {/* Kisan & Citizen Advisory Helpline Tile */}
         <div className="helpline-tile">
           <div className="helpline-tile-left">
             <div className="helpline-icon-box">
               <span className="material-symbols-outlined">support_agent</span>
             </div>
             <div className="helpline-meta">
-              <span className="helpline-label">Kisan Advisory Helpline</span>
+              <span className="helpline-label">National Scheme Helpline</span>
               <a href="tel:18001801551" className="helpline-number">
                 1800-180-1551 (Toll-Free)
               </a>
@@ -295,24 +357,24 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
       {/* 2. Scheme Vault Synthesis Summary Card */}
       <div className="vault-synthesis-card">
         <div className="vault-card-head">
-          <h3 className="vault-card-title">Scheme Vault Synthesis</h3>
-          <span className="vault-card-update">Updated just now</span>
+          <h3 className="vault-card-title">Scheme Discovery Summary</h3>
+          <span className="vault-card-update">Live Context</span>
         </div>
 
         <div className="vault-metrics-list">
           <div className="vault-metric-row">
-            <span>Fully Eligible Grants</span>
+            <span>Directly Matched Schemes</span>
             <span className="vault-metric-val green">
-              {eligibleCount} Schemes (₹3.2L max aid)
+              {eligibleCount > 0 ? `${eligibleCount} Schemes Qualified` : 'Inquire via Chat'}
             </span>
           </div>
           <div className="vault-metric-row">
-            <span>Credit Subsidies / Loans</span>
-            <span className="vault-metric-val blue">1 Scheme (Up to ₹1 Cr)</span>
+            <span>Central &amp; State Schemes Indexed</span>
+            <span className="vault-metric-val blue">148 Official Programs</span>
           </div>
           <div className="vault-metric-row">
-            <span>Requires Additional Land Docs</span>
-            <span className="vault-metric-val muted">3 State Schemes</span>
+            <span>Language Model Guidance</span>
+            <span className="vault-metric-val muted">English • हिंदी • मराठी</span>
           </div>
         </div>
 
@@ -324,7 +386,7 @@ const ProfileDossier: React.FC<ProfileDossierProps> = ({
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
             visibility
           </span>
-          <span>View All 148 Analyzed Schemes</span>
+          <span>View All Indexed Schemes</span>
         </button>
       </div>
     </aside>
