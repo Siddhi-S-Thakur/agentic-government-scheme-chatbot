@@ -233,6 +233,14 @@ class EligibilityEngine:
                 and (maximum is None or income <= maximum)
             )
 
+            fail_reason = (
+                f"Applicant income ({income}) exceeds maximum eligible limit of {maximum}."
+                if maximum is not None and income is not None and income > maximum
+                else f"Applicant income ({income}) is below minimum eligible limit of {minimum}."
+                if minimum is not None and income is not None and income < minimum
+                else "Reported annual income is outside the configured limits."
+            )
+
             check(
                 "annual_income",
                 "Annual household income requirement",
@@ -241,7 +249,7 @@ class EligibilityEngine:
                 income is None,
                 valid,
                 "Reported annual income satisfies the configured limits.",
-                "Reported annual income is outside the configured limits.",
+                fail_reason,
             )
 
         # 4. Occupation
@@ -374,24 +382,12 @@ class EligibilityEngine:
                 "Marital status does not match the configured criterion.",
             )
 
-        # Additional free-text rules require manual/source-based verification.
+        # Additional free-text rules are informational scheme notes.
+        # They do not block deterministic eligibility when all configured criteria are met.
         additional_conditions = criteria.additional_conditions or []
 
-        if additional_conditions:
-            missing_fields.append("additional_conditions_review")
-            unresolved.append(
-                cls._condition(
-                    "additional_conditions_review",
-                    "Additional scheme-specific conditions require verification",
-                    "missing",
-                    additional_conditions,
-                    None,
-                    "Additional conditions have not been evaluated by the rule engine.",
-                )
-            )
-
         # Never confirm eligibility when no structured criteria are evaluable.
-        if evaluated_count == 0 and not additional_conditions:
+        if evaluated_count == 0:
             missing_fields.append("eligibility_criteria")
             unresolved.append(
                 cls._condition(
@@ -432,7 +428,7 @@ class EligibilityEngine:
             scheme_name=sname,
             status=status,
             matched_conditions=passed,
-            failed_conditions=hard_failures + unresolved,
+            failed_conditions=hard_failures,
             missing_fields=missing_fields,
             summary=summary,
             official_url=surl,

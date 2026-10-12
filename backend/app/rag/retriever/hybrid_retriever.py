@@ -54,6 +54,11 @@ class HybridRetriever:
             profile_dict = dict(profile or {})
 
         active_filters = dict(filters or {})
+        if profile_dict:
+            if "state" not in active_filters and profile_dict.get("state"):
+                active_filters["state"] = profile_dict["state"]
+            if "beneficiary_categories" not in active_filters and profile_dict.get("occupation"):
+                active_filters["beneficiary_categories"] = profile_dict["occupation"]
         query_vector = self.embedding_service.embed_text(normalized_query)
         vector_results = self.vector_store.search(
             query_vector=query_vector,

@@ -2,12 +2,12 @@
 
 > **A Multilingual, Profile-Aware, and Eligibility-Guided Civic Beneficiary Assistance System**
 
-[![Tests](https://img.shields.io/badge/pytest-51%20passed%20(100%25)-brightgreen.svg)](#running-tests)
+[![Tests](https://img.shields.io/badge/pytest-51%20passed%20(100%25)-brightgreen.svg)](#running-tests--verification)
 [![Frontend](https://img.shields.io/badge/React%2019-Vite%20%2B%20TypeScript-blue.svg)](#frontend-setup)
 [![Backend](https://img.shields.io/badge/FastAPI-Python%203.11%2B-009688.svg)](#backend-setup)
 [![Agent](https://img.shields.io/badge/LangGraph-Single%20AI%20Orchestrator-orange.svg)](#architecture)
-[![RAG](https://img.shields.io/badge/RAG-Hybrid%20(Vector%20%2B%20BM25%20%2B%20RRF)-blueviolet.svg)](#hybrid-rag-pipeline)
-[![Languages](https://img.shields.io/badge/Languages-English%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A4%81%20%7C%20%E0%A4%AE%E0%A4%B0%E0%A4%BE%E0%A4%A0%E0%A5%80-red.svg)](#multilingual-support)
+[![RAG](https://img.shields.io/badge/RAG-Hybrid%20(Vector%20%2B%20BM25%20%2B%20RRF)-blueviolet.svg)](#key-features)
+[![Languages](https://img.shields.io/badge/Languages-English%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A4%81%20%7C%20%E0%A4%AE%E0%A4%B0%E0%A4%BE%E0%A4%A0%E0%A5%80-red.svg)](#key-features)
 
 A full-stack, enterprise-grade AI-powered web platform designed to help Indian citizens discover government welfare schemes tailored to their individual profile, assess their eligibility with deterministic precision, and receive source-grounded, explainable recommendations — natively in **English, Hindi (हिंदी), and Marathi (मराठी)**.
 
@@ -17,15 +17,16 @@ A full-stack, enterprise-grade AI-powered web platform designed to help Indian c
 
 | Metric / Component | Status | Details |
 |---|---|---|
-| **Automated Test Suite** | 🟢 **51 / 51 Passed (100%)** | Unit (42), Integration (2), Retrieval Benchmarks (7) |
-| **Frontend Production Build** | 🟢 **Passing (`tsc -b && vite build`)** | Zero TypeScript compilation or bundling errors |
-| **Chat-First Guest Flow** | 🟢 **Zero-Barrier Access** | Immediate chat without signup; optional Sign In to persist history |
-| **Backend API Engine** | 🟢 **Operational (`FastAPI 0.115`)** | REST endpoints for chat, retrieval, eligibility, auth & sync |
-| **AI Orchestrator** | 🟢 **Production Ready** | LangGraph state graph with progressive profile extraction & MCQ mode |
-| **Hybrid RAG Pipeline** | 🟢 **Benchmarked & Operational** | Dense vector search + BM25 keyword index + RRF fusion + Reranking |
-| **Eligibility Engine** | 🟢 **Deterministic (Python)** | Evaluates income, age, landholding, caste, gender, state without hallucination |
-| **LLM Grounding Layer** | 🟢 **Multi-Provider & Fallback** | Gemini 1.5/2.0 Flash + OpenAI GPT-4o-mini + Offline Grounded Fallback |
-| **Civic Portal UI** | 🟢 **Full Beneficiary Suite** | Chat Caseworker, Citizen Dashboard, Active Applications, DBT Tracker, DigiLocker |
+| **Automated Test Suite** | 🟢 **51 / 51 Passed (100%)** | 42 Unit tests, 2 End-to-End Integration tests, 7 Hybrid Retrieval & MRR benchmarks |
+| **Frontend Production Build** | 🟢 **Passing (`tsc -b && vite build`)** | Zero TypeScript compilation or bundling errors (Vite 8 + React 19) |
+| **Chat-First Guest Flow** | 🟢 **Zero-Barrier Access** | Immediate conversational access without signup; optional Sign In to persist and sync history |
+| **Backend API Engine** | 🟢 **Operational (`FastAPI 0.115`)** | Fully typed REST endpoints for chat, retrieval, eligibility, auth & conversation sync |
+| **AI Orchestrator** | 🟢 **Production Ready** | LangGraph state graph with progressive profile extraction, sufficiency check & MCQ mode |
+| **Hybrid RAG Pipeline** | 🟢 **Benchmarked & Operational** | Dense vector search + BM25 keyword index + RRF fusion + Cross-Encoder reranking |
+| **Eligibility Engine** | 🟢 **Deterministic (Python)** | Evaluates income, age, landholding, caste, gender, state without LLM hallucination |
+| **LLM Grounding Layer** | 🟢 **Multi-Provider & Fallback** | Google Gemini 1.5/2.0 Flash + OpenAI GPT-4o-mini + Deterministic Offline Fallback |
+| **Civic Portal UI** | 🟢 **Full Beneficiary Suite** | Agentic Caseworker, Citizen Dashboard, Active Applications, DBT Tracker, DigiLocker |
+| **UI Security & Markdown** | 🟢 **XSS-Safe Architecture** | Custom safe Markdown subset parser without `dangerouslySetInnerHTML` |
 
 ---
 
@@ -45,7 +46,9 @@ A full-stack, enterprise-grade AI-powered web platform designed to help Indian c
 - [Key Features](#key-features)
 - [Supported Schemes](#supported-schemes)
 - [How It Works](#how-it-works)
+- [Recent Milestones & Changelog](#recent-milestones--changelog)
 - [Roadmap](#roadmap)
+- [License](#license)
 
 ---
 
@@ -126,7 +129,7 @@ India administers hundreds of central and state welfare initiatives, yet citizen
 |   • Strict Anti-Hallucination Prompting: Grounded solely on retrieved scheme documents|
 |   • Multilingual Translation & Response Synthesis (English, Hindi, Marathi)           |
 +------------------------------------------+--------------------------------------------+
-                                           |
+                                            |
                          +-----------------+-----------------+
                          |                                   |
                          v                                   v
@@ -143,14 +146,14 @@ India administers hundreds of central and state welfare initiatives, yet citizen
 | **Design System** | **Civic Blueprint (MD3 Vanilla CSS)** | Government-grade design tokens, public-service aesthetics, responsive grid |
 | **Typography** | **Public Sans & Inter (Google Fonts)** | Clean, accessible civic readability across desktop and mobile |
 | **Internationalization** | **i18next, react-i18next** | Seamless real-time switching between English, Hindi, and Marathi |
-| **Backend Framework** | **FastAPI 0.115, Uvicorn, Python 3.11+** | High-throughput asynchronous REST API |
+| **Backend Framework** | **FastAPI 0.115, Uvicorn, Python 3.11+** | High-throughput asynchronous REST API with Lifespan management |
 | **Agentic Workflow** | **LangGraph, LangChain Core** | Stateful multi-turn agent graph with conditional routing & feedback loops |
 | **Hybrid Retrieval** | **Rank-BM25, Reciprocal Rank Fusion (RRF)** | Combined dense semantics + exact keyword and department name matching |
 | **Vector Storage** | **Qdrant Vector DB & InMemoryVectorStore** | Scalable vector search with Qdrant Cloud support & zero-dependency local mode |
 | **Eligibility Verification** | **Deterministic Rule Engine (Python)** | High-assurance condition evaluation eliminating hallucination risks |
 | **LLM Grounding Layer** | **Google Gemini (`gemini-1.5-flash`), OpenAI** | Grounded explanation synthesis with automatic offline fallback mode |
 | **Persistence & Models** | **SQLAlchemy, Pydantic v2, SQLite / PostgreSQL** | Scheme catalogs, citizen profile dossier, and conversation audit trails |
-| **Testing & Evaluation** | **Pytest, LangSmith, AnyIO** | 49 automated unit, integration, and retrieval evaluation tests |
+| **Testing & Evaluation** | **Pytest 9+, LangSmith, AnyIO** | 51 automated unit, integration, and retrieval evaluation tests |
 
 ---
 
@@ -177,7 +180,8 @@ gov scheme chatbot/
 │       │   ├── models.py               # Evaluation models (ELIGIBLE, NOT_ELIGIBLE, MISSING)
 │       │   └── service.py              # Recommendation aggregation service
 │       ├── evaluation/                 # Retrieval & RAG quality metrics
-│       │   └── metrics.py              # Precision@K, Recall@K, Reciprocal Rank (MRR)
+│       │   ├── evaluate_retrieval.py   # Precision@K, Recall@K, Reciprocal Rank runner
+│       │   └── metrics.py              # Precision, Recall, and MRR metrics
 │       ├── llm/                        # Multi-provider LLM grounding layer
 │       │   ├── factory.py              # Provider factory (Gemini, OpenAI, Offline fallback)
 │       │   ├── gemini.py               # Google Gemini client with structured prompts
@@ -208,14 +212,14 @@ gov scheme chatbot/
 │   ├── public/                         # Public assets, SVGs, favicon
 │   ├── src/
 │   │   ├── main.tsx                    # React application entry point
-│   │   ├── App.tsx                     # Main layout container
+│   │   ├── App.tsx                     # Main layout container & tab routing
 │   │   ├── index.css                   # Civic Blueprint design tokens & component styles
 │   │   ├── api/
 │   │   │   └── client.ts               # Axios API client connecting to FastAPI backend
 │   │   ├── components/
 │   │   │   ├── Header.tsx              # Portal header, live context indicator & helplines
 │   │   │   ├── Sidebar.tsx             # 6-view civic navigation sidebar
-│   │   │   ├── ChatInterface.tsx       # Conversational AI assistant with MCQ support
+│   │   │   ├── ChatInterface.tsx       # Conversational AI assistant with safe Markdown & MCQ
 │   │   │   ├── ProfileDossier.tsx      # Real-time citizen profile drawer with completion bar
 │   │   │   ├── SchemeCard.tsx          # Scheme card with match badge, criteria & actions
 │   │   │   ├── Modals.tsx              # One-click Application, Details, Help & Vault modals
@@ -239,7 +243,7 @@ gov scheme chatbot/
 │   ├── gov_schemes.db                  # Local SQLite database (auto-created for dev)
 │   └── raw/                            # Source documents and gazette records
 ├── tests/
-│   ├── unit/                           # 40 Unit tests (API, DB, Engine, LLM, Profile, Agent)
+│   ├── unit/                           # 42 Unit tests (API, DB, Engine, LLM, Profile, Agent)
 │   ├── integration/                    # 2 End-to-end integration pipeline tests
 │   └── retrieval/                      # 7 Hybrid retrieval & multilingual evaluation tests
 ├── requirements.txt                    # Complete frozen Python dependency manifest
@@ -256,10 +260,10 @@ gov scheme chatbot/
 
 | Requirement | Recommended Version | Note |
 |---|---|---|
-| **Python** | `3.11` to `3.14` | Backend environment |
+| **Python** | `3.11` to `3.14` | Backend runtime |
 | **Node.js** | `18+` (LTS) | Frontend runtime |
 | **npm** | `9+` | Frontend package manager |
-| **Git** | `2.x` | Source control |
+| **Git** | `2.x` | Version control |
 
 > **Development Mode Notice**: The platform runs out of the box in zero-setup development mode using SQLite and an in-memory vector store. PostgreSQL and Qdrant instances are entirely optional.
 
@@ -291,7 +295,7 @@ gov scheme chatbot/
 
 4. **Configure environment variables:**
    ```bash
-   # Copy the sample file:
+   # Copy the sample configuration:
    cp .env.example .env
    ```
    *(Optionally add your `GEMINI_API_KEY` in `.env`. If omitted, the backend automatically uses the built-in deterministic offline fallback without requiring any external API key.)*
@@ -340,7 +344,7 @@ gov scheme chatbot/
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` in the project root. The available configuration keys:
+Copy `.env.example` to `.env` in the project root. Available configuration keys:
 
 | Variable | Description | Default | Required in Production |
 |---|---|---|:---:|
@@ -423,18 +427,16 @@ The backend exposes clean, fully-typed REST endpoints:
   "recommendations": [
     {
       "scheme_id": "pm-kisan",
-      "scheme_name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+      "scheme_name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
       "status": "ELIGIBLE",
-      "match_percentage": 96.0,
-      "effective_benefit": "₹6,000 per year in 3 equal installments",
-      "department": "Ministry of Agriculture and Farmers Welfare",
+      "department": "Department of Agriculture and Farmers Welfare",
       "matched_conditions": [
-        {"condition_name": "Occupation", "status": "passed", "reason": "Farmer qualifies"}
+        {"condition_name": "occupation", "status": "passed", "reason": "Occupation (farmer) matches configured category."}
       ],
-      "unmatched_conditions": [],
-      "missing_conditions": [],
-      "required_documents": ["Aadhaar Card", "Land Ownership Record (7/12 extract)", "Bank Account Details"],
-      "application_link": "https://pmkisan.gov.in"
+      "failed_conditions": [],
+      "missing_fields": [],
+      "summary": "Applicant meets all configured criteria for PM-KISAN.",
+      "official_url": "https://pmkisan.gov.in"
     }
   ],
   "source_urls": ["https://pmkisan.gov.in"],
@@ -486,8 +488,11 @@ The project includes an automated test suite across unit, integration, and retri
 
 ### Run All Tests
 ```bash
-# From project root with .venv activated:
+# On Windows (PowerShell / CMD):
 .venv\Scripts\pytest.exe -v
+
+# On macOS / Linux:
+pytest -v
 ```
 
 ### Run Specific Test Suites
@@ -522,32 +527,37 @@ npm run build
 ## Key Features
 
 ### 🤖 1. Autonomous LangGraph Orchestrator
-- **Stateful Multi-Turn Graph**: Maintains conversation context, intent tracking, and profile state.
-- **Adaptive Clarification**: If critical criteria (e.g., state or occupation) are missing for broad searches, the agent asks follow-up questions before triggering retrieval.
+- **Stateful Multi-Turn Graph**: Maintains conversation context, intent tracking, and profile state across turns.
+- **Adaptive Clarification**: If critical criteria (e.g., state or occupation) are missing for broad searches, the agent proactively asks follow-up questions before triggering retrieval.
 - **Guided MCQ Mode**: Users can toggle or request MCQ mode to answer targeted questions via interactive buttons.
 
 ### 🔎 2. High-Precision Hybrid RAG Pipeline
 - **Dual-Retrieval Architecture**: Semantic dense vector search + lexical BM25 keyword search.
-- **Reciprocal Rank Fusion (RRF)**: Merges disparate rank lists objectively.
+- **Reciprocal Rank Fusion (RRF)**: Merges disparate rank lists objectively without artificial score skew.
 - **Cross-Encoder Reranker**: Reranks top candidates to maximize precision.
-- **Metadata Pre-Filtering**: Filters out irrelevant state-specific schemes prior to retrieval.
+- **Metadata Pre-Filtering**: Automatically scopes queries to user residency while maintaining central initiatives.
 
 ### ⚖️ 3. Zero-Hallucination Eligibility Engine
 - **Deterministic Python Rules**: Eligibility is evaluated via strict code logic, not generative guesswork.
 - **Three-Tier Status**: Categorizes schemes into `ELIGIBLE`, `NOT_ELIGIBLE`, or `INFORMATION_MISSING`.
 - **Condition Transparency**: Outputs detailed breakdowns of which specific criteria passed or failed.
+- **Separation of Missing vs Unmet Criteria**: Distinguishes unfulfilled requirements from fields that simply require further input.
 
 ### 🌐 4. Native Tri-Lingual Support
 - **Full Localization**: Complete UI and agent explanations in English, Hindi (हिंदी), and Marathi (मराठी).
 - **Devanagari Normalization**: Automatically handles Marathi and Hindi numerals (e.g., `३०` → `30`) and currency notations (`₹१,८०,०००` → `180000`).
 
-### 🏛️ 5. Civic Blueprint Beneficiary Suite
+### 🛡️ 5. XSS-Safe UI Architecture
+- **Safe Markdown Rendering**: The conversational interface uses a custom recursive parser for headings, bold text, links, and lists without relying on `dangerouslySetInnerHTML`.
+- **Strict Provenance & Claim Verification**: Displays official registry badges and links only when substantiated by backend records.
+
+### 🏛️ 6. Civic Blueprint Beneficiary Suite
 - **Agentic Caseworker**: Interactive conversational interface with prompt suggestions, live telemetry, and evidence inspect drawers.
 - **Citizen Dashboard**: Live metric cards, estimated grant aid, priority alerts, and recent subsidy activities.
 - **AI Recommendations Explorer**: Comprehensive scheme catalog with category tabs (Agriculture, Education, Healthcare, Social Welfare, Women & Child).
 - **Active Applications Tracker**: Live lifecycle tracking of submitted applications with reference numbers and status stages.
 - **Direct Benefit Transfer (DBT) Tracker**: Aadhaar-linked bank transfer logs, payment statuses, and disbursement timelines.
-- **DigiLocker Dossier Vault**: Secure document locker for verified certificates (Aadhaar, 7/12 Land Extract, Caste, Income, Ration Card) with live verification badges.
+- **DigiLocker Dossier Vault**: Secure document locker for verified certificates (Aadhaar, 7/12 Land Extract, Caste, Income, Ration Card) with live verification seals.
 - **Interactive Modals**: One-click scheme application generator, document import modal, profile editor, and helpline drawer.
 
 ---
@@ -575,6 +585,33 @@ The initial knowledge base is seeded with verified government schemes across cen
 5. **Deterministic Evaluation**: Each candidate scheme's requirements are evaluated against the citizen's profile attributes.
 6. **Grounded Synthesis**: The LLM synthesizes an empathetic, source-grounded response citing official documentation.
 7. **Interactive Presentation**: The frontend renders recommendations, updates the Profile Dossier completion index, and displays actionable application buttons.
+
+---
+
+## Recent Milestones & Changelog
+
+### October 2026 — UI Modernization & Core Stabilization
+- **Test Suite Fully Green (51/51 Passed)**: Stabilized deterministic eligibility engine condition separation, income limit reporting, and hybrid retriever profile state filtering across all unit, integration, and benchmark tests.
+- **XSS-Safe Inline Markdown**: Chat interface upgraded with a native recursive Markdown renderer (`renderAssistantMarkdown`) for bold tags, markdown links, headings, and bullet points without `dangerouslySetInnerHTML`.
+- **Material Design 3 Civic System**: Standardized color palette, contrast ratios, card typography, and responsive breakpoints across all 6 portal views.
+- **Verified Claim Safeguards**: Removed synthetic match percentages in the frontend; all badges and metrics directly reflect backend ground-truth values.
+
+### Milestone 6 — React 19 Frontend Suite
+- Delivered full 6-view Civic Portal (Agentic Caseworker, Citizen Dashboard, AI Recommendations, Active Applications, DBT Tracker, DigiLocker).
+- Native tri-lingual i18n support for English, Hindi, and Marathi with live toggle.
+
+### Milestone 5 — Multi-Provider Grounded Explanation Layer
+- Integrated Google Gemini 1.5/2.0 Flash and OpenAI GPT-4o-mini with prompt engineering preventing hallucinations.
+- Added deterministic offline grounded fallback operating with zero external API key requirements.
+
+### Milestone 4 — LangGraph AI Orchestrator
+- Stateful multi-turn conversation graph with progressive profile accumulation, sufficiency gating, and guided MCQ questions.
+
+### Milestone 3 — Deterministic Eligibility Rule Engine
+- Pure Python criteria engine eliminating LLM hallucinations in civic benefit decisions.
+
+### Milestone 2 — Hybrid RAG Pipeline
+- Dense semantic vector search + Rank-BM25 sparse search + Reciprocal Rank Fusion + Cross-Encoder reranker.
 
 ---
 
