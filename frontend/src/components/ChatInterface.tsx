@@ -29,6 +29,39 @@ function formatTime(d: Date): string {
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+// Render the small Markdown subset returned by the deterministic backend without dangerouslySetInnerHTML.
+function renderAssistantMarkdown(source: string): React.ReactNode {
+  const lines = source.split(/\r?\n/);
+  const renderInline = (line: string, lineKey: string): React.ReactNode[] => {
+    const tokenPattern = /(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^)]+\))/g;
+    const parts = line.split(tokenPattern);
+    return parts.map((part, index) => {
+      const key = `${lineKey}-${index}`;
+      const bold = part.match(/^\*\*(.+)\*\*$/);
+      const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/);
+      if (bold) return <strong key={key}>{bold[1]}</strong>;
+      if (link) return <a key={key} href={link[2]} target="_blank" rel="noopener noreferrer">{link[1]}</a>;
+      return <React.Fragment key={key}>{part}</React.Fragment>;
+    });
+  };
+
+  return <div className="assistant-markdown">{lines.map((raw, index) => {
+    const line = raw.trimEnd();
+    const key = `line-${index}`;
+    if (!line.trim()) return <div key={key} className="markdown-spacer" />;
+    const heading = line.match(/^(#{1,4})\s+(.+)$/);
+    if (heading) {
+      const content = renderInline(heading[2], key);
+      if (heading[1].length === 1) return <h2 key={key}>{content}</h2>;
+      if (heading[1].length === 2) return <h3 key={key}>{content}</h3>;
+      return <h4 key={key}>{content}</h4>;
+    }
+    const bullet = line.match(/^\s*[-*]\s+(.+)$/);
+    if (bullet) return <div key={key} className="markdown-list-item">• {renderInline(bullet[1], key)}</div>;
+    return <p key={key}>{renderInline(line, key)}</p>;
+  })}</div>;
+}
+
 const QUICK_CHIPS = [
   'Lakhpati Didi details',
   'PMAY-G Housing Subsidy',
@@ -271,14 +304,10 @@ const ChatInterface: React.FC = () => {
         }
 
         // Process recommendations if returned
-        const recs: SchemeRecommendation[] = (response.recommendations || []).map((r) => {
-          return {
-            ...r,
-            match_percentage: r.status === 'ELIGIBLE' ? 95 : 75,
-            category_badge: r.level === 'central' ? 'Centrally Sponsored Scheme (CSS)' : 'State Direct Benefit Initiative',
-            effective_benefit: r.status === 'ELIGIBLE' ? 'Direct Subsidy Assistance' : 'Financial Aid',
-          };
-        });
+        // Preserve backend values. Never invent match percentages or benefit labels in the UI.
+        const recs: SchemeRecommendation[] = (response.recommendations || []).map((r) => ({
+          ...r,
+        }));
 
         if (recs.length > 0) {
           setAllRecommendations((prev) => {
@@ -300,10 +329,8 @@ const ChatInterface: React.FC = () => {
           timestamp: new Date(),
           mcq_options: response.mcq_options ?? undefined,
           recommendations: recs.length > 0 ? recs : undefined,
-          syncNotice:
-            response.needs_clarification
-              ? undefined
-              : 'Cross-referenced against National Digital Scheme Registry',
+          // Do not display a registry-verification claim unless the backend provides proof.
+          syncNotice: undefined,
         };
 
         setMessages((prev) => [...prev, assistantMsg]);
@@ -646,7 +673,7 @@ const ChatInterface: React.FC = () => {
                                     <span>{msg.syncNotice}</span>
                                   </div>
                                 )}
-                                <div>{msg.content}</div>
+                                {isUser ? <div>{msg.content}</div> : renderAssistantMarkdown(msg.content)}
 
                                 {/* MCQ Options if returned by backend */}
                                 {msg.mcq_options && msg.mcq_options.length > 0 && (

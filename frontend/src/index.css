@@ -2957,3 +2957,651 @@ button, input, select, textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--outline-variant);
 }
+
+/* ==========================================================
+   PREMIUM CIVIC UI — Phase 1
+   Modern navy, clean white surfaces and emerald accents
+   Existing component selectors and functionality preserved
+   ========================================================== */
+
+:root {
+  color-scheme: light;
+
+  --surface: #ffffff;
+  --surface-dim: #e9eef5;
+  --surface-bright: #ffffff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f8fafc;
+  --surface-container: #f1f5f9;
+  --surface-container-high: #e8eef5;
+  --surface-container-highest: #dce5ef;
+
+  --on-surface: #172b43;
+  --on-surface-variant: #53657a;
+  --inverse-surface: #172b43;
+  --inverse-on-surface: #f8fafc;
+
+  --outline: #718096;
+  --outline-variant: #d8e1eb;
+  --surface-tint: #254c76;
+
+  --primary: #123456;
+  --on-primary: #ffffff;
+  --primary-container: #e6eef8;
+  --on-primary-container: #183a60;
+  --inverse-primary: #c4d9f2;
+
+  --secondary: #456789;
+  --on-secondary: #ffffff;
+  --secondary-container: #eaf1f8;
+  --on-secondary-container: #294b70;
+
+  --tertiary: #086b50;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #d9f5e9;
+  --on-tertiary-container: #087652;
+
+  --error: #b42332;
+  --on-error: #ffffff;
+  --error-container: #fff0f0;
+  --on-error-container: #91212d;
+
+  --warning: #a65d08;
+  --warning-container: #fff5df;
+  --on-warning-container: #854b08;
+
+  --background: #f5f7fb;
+  --on-background: #172b43;
+  --surface-variant: #e8eef5;
+
+  --rounded-sm: 0.375rem;
+  --rounded-default: 0.5rem;
+  --rounded-md: 0.625rem;
+  --rounded-lg: 0.875rem;
+  --rounded-xl: 1.125rem;
+  --rounded-2xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  --font-headline: 'Public Sans', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', 'Noto Sans Devanagari', system-ui, sans-serif;
+
+  --shadow-sm: 0 1px 3px rgba(18, 52, 86, 0.05);
+  --shadow-md: 0 5px 18px rgba(18, 52, 86, 0.07);
+  --shadow-lg: 0 12px 30px rgba(18, 52, 86, 0.10);
+  --shadow-xl: 0 20px 48px rgba(18, 52, 86, 0.13);
+
+  --bevel-highlight: transparent;
+  --bevel-shadow: transparent;
+  --inset-shadow: none;
+  --emboss-border: 1px solid #e0e7ef;
+  --groove-border: 1px solid #e0e7ef;
+}
+
+/* Global foundation */
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: #bdcbd9 #f5f7fb;
+}
+
+body {
+  background: #f5f7fb;
+  color: #172b43;
+  font-family: var(--font-body);
+  line-height: 1.65;
+}
+
+::selection {
+  background: #d5e7fb;
+  color: #123456;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #245a91;
+  outline-offset: 3px;
+}
+
+/* Application shell */
+
+.app-container {
+  background: #f5f7fb;
+  background-image: none;
+}
+
+.gov-sidebar {
+  background: #ffffff;
+  background-image: none;
+  border-right: 1px solid #e1e8f0;
+  box-shadow: 4px 0 24px rgba(18, 52, 86, 0.035);
+}
+
+.gov-sidebar-brand {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.brand-title {
+  color: #123456;
+  text-shadow: none;
+  letter-spacing: -0.035em;
+}
+
+.brand-subtitle {
+  color: #718096;
+  letter-spacing: 0.09em;
+}
+
+.gov-nav {
+  gap: 0.375rem;
+}
+
+.gov-nav-item {
+  min-height: 44px;
+  color: #53657a;
+  border-radius: 10px;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.gov-nav-item:hover {
+  background: #f1f5fa;
+  color: #123456;
+  border-color: transparent;
+}
+
+.gov-nav-item.active {
+  background: #eaf1f9;
+  color: #123456;
+  border-color: #dce7f4;
+  box-shadow: inset 3px 0 0 #245a91;
+  font-weight: 700;
+}
+
+.gov-nav-item.active .material-symbols-outlined {
+  color: #176c55;
+}
+
+.gov-sidebar-footer {
+  border-top: 1px solid #edf1f6;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.kyc-status-card {
+  background: #f5faf7;
+  border: 1px solid #d9ebe1;
+  box-shadow: none;
+}
+
+.kyc-status-title {
+  color: #176c55;
+}
+
+.kyc-dot {
+  background: #16815f;
+  box-shadow: none;
+}
+
+/* Header */
+
+.gov-main-wrapper {
+  background: #f5f7fb;
+  background-image: none;
+}
+
+.gov-header {
+  background: rgba(255, 255, 255, 0.94);
+  background-image: none;
+  border-bottom: 1px solid #e1e8f0;
+  box-shadow: 0 3px 16px rgba(18, 52, 86, 0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.header-portal-pill,
+.header-lang-select,
+.header-font-controls,
+.header-help-btn {
+  background: #ffffff;
+  color: #294b70;
+  border: 1px solid #dce5ef;
+  box-shadow: none;
+}
+
+.header-portal-pill .material-symbols-outlined {
+  color: #176c55;
+}
+
+.header-lang-select select,
+.header-lang-select select option {
+  background: #ffffff;
+  color: #172b43;
+}
+
+.font-btn {
+  color: #53657a;
+}
+
+.font-btn:hover,
+.font-btn.active {
+  background: #eaf1f9;
+  color: #123456;
+  box-shadow: none;
+}
+
+.header-avatar {
+  color: #123456;
+  background: #e6eef8;
+  border: 2px solid #dce7f4;
+  box-shadow: none;
+}
+
+/* Content canvas */
+
+.gov-main-content {
+  padding-bottom: 3rem;
+}
+
+.canvas-root {
+  max-width: 1500px;
+  padding: 1.5rem 2rem;
+}
+
+.provenance-strip {
+  background: #ffffff;
+  border: 1px solid #e1e8f0;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  padding: 0.875rem 1rem;
+}
+
+.strip-title {
+  color: #123456;
+  text-shadow: none;
+}
+
+.strip-desc {
+  color: #64748b;
+}
+
+.strip-badge {
+  background: #e8f6ef;
+  color: #176c55;
+  border-color: #cce8da;
+}
+
+.strip-badge.guest-mode-badge {
+  background: #fff7e8;
+  color: #8a530d;
+  border-color: #f0dfb8;
+}
+
+.strip-btn {
+  min-height: 40px;
+  background: #ffffff;
+  color: #294b70;
+  border: 1px solid #dce5ef;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.strip-btn:hover {
+  background: #f1f5fa;
+}
+
+.strip-btn.reset:hover {
+  background: #fff0f0;
+  color: #b42332;
+}
+
+/* Main workspace and chat */
+
+.workspace-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 22rem);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.chat-column {
+  min-width: 0;
+  gap: 1rem;
+}
+
+.chat-stream-vessel {
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid #e1e8f0;
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  padding: clamp(1rem, 2vw, 1.75rem);
+  gap: 1.5rem;
+  min-height: 480px;
+}
+
+.chat-message-row {
+  gap: 0.875rem;
+}
+
+.message-avatar-agent {
+  background: #eaf1f9;
+  color: #123456;
+  border: 1px solid #dce7f4;
+  box-shadow: none;
+  border-radius: 12px;
+}
+
+.message-avatar-agent .material-symbols-outlined {
+  color: #176c55;
+}
+
+.message-avatar-user {
+  background: #dce9f8;
+  border: 1px solid #cbdced;
+  box-shadow: none;
+}
+
+.message-bubble-wrap {
+  min-width: 0;
+}
+
+.message-meta {
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+
+.message-sender {
+  color: #294b70;
+  text-shadow: none;
+}
+
+.message-time {
+  color: #8391a3;
+}
+
+.bubble-content-agent {
+  background: #f5f8fc;
+  color: #24374d;
+  border: 1px solid #e5ebf2;
+  border-radius: 4px 16px 16px 16px;
+  box-shadow: none;
+  padding: 1rem 1.125rem;
+  overflow-wrap: anywhere;
+}
+
+.bubble-content-user {
+  background: #123456;
+  color: #ffffff;
+  border: 1px solid #123456;
+  border-radius: 16px 4px 16px 16px;
+  box-shadow: none;
+  padding: 1rem 1.125rem;
+  overflow-wrap: anywhere;
+}
+
+.sync-verified-pill {
+  color: #176c55;
+}
+
+.reasoning-pill-content {
+  background: #f5f8fc;
+  border: 1px solid #e5ebf2;
+  box-shadow: none;
+}
+
+.bounce-dot {
+  background: #245a91;
+  box-shadow: none;
+}
+
+/* Scheme recommendations */
+
+.scheme-card-wrapper {
+  width: calc(100% - 3rem);
+  min-width: 0;
+}
+
+.scheme-card {
+  background: #ffffff;
+  background-image: none;
+  border: 1px solid #dfe7f0;
+  border-radius: 15px;
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.scheme-card:hover {
+  border-color: #b8cbe0;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.scheme-card.eligible::before {
+  background: #16815f;
+  box-shadow: none;
+}
+
+.scheme-card.provisional::before,
+.scheme-card.partial::before {
+  background: #d18a19;
+  box-shadow: none;
+}
+
+.scheme-card.ineligible::before {
+  background: #c33d48;
+  box-shadow: none;
+}
+
+.scheme-header-ribbon {
+  background: #f5f8fc;
+}
+
+/* Chat controls */
+
+.chat-input-console {
+  background: #ffffff;
+  border: 1px solid #e1e8f0;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.chat-input-field-wrap {
+  background: #ffffff;
+  border: 1px solid #ccd8e5;
+  border-radius: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.chat-input-field-wrap:focus-within {
+  border-color: #245a91;
+  box-shadow: 0 0 0 3px rgba(36, 90, 145, 0.11);
+}
+
+.chat-main-input {
+  color: #172b43;
+  background: transparent;
+}
+
+.chat-main-input::placeholder {
+  color: #8391a3;
+}
+
+.addon-icon-btn {
+  color: #53657a;
+  border-radius: 8px;
+}
+
+.addon-icon-btn:hover {
+  color: #123456;
+  background: #edf3fa;
+}
+
+.chat-send-btn {
+  min-height: 44px;
+  background: #123456;
+  color: #ffffff;
+  border: 1px solid #123456;
+  border-radius: 10px;
+  box-shadow: none;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: #1e4b76;
+  transform: translateY(-1px);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.quick-suggestion-chip,
+.clarification-option-btn {
+  background: #ffffff;
+  color: #294b70;
+  border: 1px solid #d7e2ee;
+  border-radius: 999px;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.quick-suggestion-chip:hover,
+.clarification-option-btn:hover {
+  background: #edf4fb;
+  border-color: #a9c1db;
+}
+
+.mcq-validator-badge {
+  color: #176c55;
+}
+
+.console-footnote {
+  color: #718096;
+}
+
+.footnote-security {
+  color: #53657a;
+}
+
+/* Consistent form controls */
+
+input,
+select,
+textarea {
+  accent-color: #245a91;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Responsive adjustments */
+
+@media (max-width: 1024px) {
+  .canvas-root {
+    padding: 1.25rem;
+  }
+
+  .workspace-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gov-sidebar {
+    background: #ffffff;
+    background-image: none;
+    box-shadow: 12px 0 36px rgba(18, 52, 86, 0.12);
+  }
+}
+
+@media (max-width: 640px) {
+  .canvas-root {
+    padding: 0.875rem;
+  }
+
+  .provenance-strip {
+    align-items: flex-start;
+    padding: 0.75rem;
+  }
+
+  .strip-status,
+  .strip-actions {
+    flex-wrap: wrap;
+  }
+
+  .strip-actions {
+    width: 100%;
+  }
+
+  .strip-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .chat-stream-vessel {
+    min-height: 380px;
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .chat-message-row {
+    gap: 0.625rem;
+  }
+
+  .message-avatar-agent,
+  .message-avatar-user {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+  }
+
+  .scheme-card-wrapper {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .chat-input-console {
+    padding: 0.875rem;
+  }
+}
