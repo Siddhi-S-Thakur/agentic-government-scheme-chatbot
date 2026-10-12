@@ -198,15 +198,41 @@ class ProfileExtractor:
                 profile.gender = canonical_gender
                 break
 
+        
         # 9. Extract Education Level
-        if any(term in lowered for term in ["10th", "ssc", "१० वी", "दसवी", "10 वी"]):
+        # Check specific levels before generic "graduate" terms.
+        if any(term in lowered for term in [
+            "10th pass", "10th", "ssc", "secondary school",
+            "दसवी", "दसवीं"
+        ]):
             profile.education_level = "10th_pass"
-        elif any(term in lowered for term in ["12th", "hsc", "१२ वी", "बारहवी", "12 वी"]):
+
+        elif any(term in lowered for term in [
+            "12th pass", "12th", "hsc", "higher secondary",
+            "बारहवीं"
+        ]):
             profile.education_level = "12th_pass"
-        elif any(term in lowered for term in ["graduate", "degree", "पदवी", "स्नातक"]):
-            profile.education_level = "graduate"
-        elif any(term in lowered for term in ["postgraduate", "master", "पदव्युत्तर", "परास्नातक"]):
+
+        elif any(term in lowered for term in [
+            "postgraduate", "post-graduate", "post graduate",
+            "master's", "masters", "master degree", "m.tech",
+            "m.e.", "mba", "m.sc"
+        ]):
             profile.education_level = "postgraduate"
+
+        elif any(term in lowered for term in [
+            "undergraduate", "under-graduate", "under graduate",
+            "undergrad", "bachelor", "b.tech", "b.e.",
+            "b.sc", "b.com", "pursuing engineering",
+            "pursuing a degree", "currently studying",
+            "college student"
+        ]):
+            profile.education_level = "undergraduate"
+
+        elif any(term in lowered for term in [
+            "graduate", "graduated", "degree"
+        ]):
+            profile.education_level = "graduate"
 
         # 10. Extract Disability Status
         if any(term in lowered for term in ["disabled", "handicapped", "दिव्यांग", "अपंग", "disability"]):
